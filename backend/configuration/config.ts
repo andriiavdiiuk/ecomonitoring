@@ -7,7 +7,11 @@ interface Config {
     environment: string,
     db_connection_string: string,
     jwt_secret: string,
-    allowedOrigins: string[]
+    cors: {
+        origins: string[],
+        methods: string[],
+        credentials: boolean,
+    }
 }
 
 const config: Config = {
@@ -15,8 +19,13 @@ const config: Config = {
     environment: requireEnv("ENVIRONMENT"),
     db_connection_string: requireEnv("DB_CONNECTION_STRING"),
     jwt_secret: requireEnv("JWT_SECRET"),
-    allowedOrigins:  requireEnv("ALLOWED_ORIGINS").split(",").map(origin => origin.trim())
+    cors: {
+        origins: requireEnv("ALLOWED_ORIGINS").split(",").map(origin => origin.trim()),
+        methods: ["GET","PATCH","POST","DELETE"],
+        credentials: true,
+    }
 }
+
 function requireEnv(key: any): string {
     const value = process.env[key];
     if (value === undefined || value.trim() === "") {

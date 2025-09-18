@@ -10,10 +10,12 @@
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
+    "rootDir": ".",
     "paths": {
-      "*": ["./node_modules/*"]
+      "*": ["./node_modules/*"],
+      "backend/*": ["backend/*"]
     }
   },
-  "include": ["backend"],
+  "include": ["./backend/**/*.ts"],
   "exclude": ["node_modules"],
 }
