@@ -5,21 +5,28 @@
   "main": "backend/app.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tsx backend/app.ts"
+    "start": "tsx backend/src/app.ts"
   },
   "private": true,
   "dependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/mongoose": "^5.11.97",
+    "argon2": "^0.44.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.18.1"
   },
   "type": "module",
   "devDependencies": {
-    "tsx": "^4.20.5"
+    "@eslint/js": "^9.35.0",
+    "eslint": "^9.35.0",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.44.0"
   }
 }

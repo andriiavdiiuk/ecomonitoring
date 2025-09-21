@@ -11,6 +11,7 @@ import {
     validationErrorHandler
 } from "backend/middleware/errorHandler";
 import {notFoundHandler} from "backend/middleware/notFoundHandler";
+import userRoutes from "backend/routes/UserRoutes";
 
 const app = express();
 
@@ -30,12 +31,14 @@ app.use((req, res, next) => {
 });
 
 
-app.use(errorLogger)
-app.use(validationErrorHandler)
-app.use(castErrorHandler)
-app.use(duplicateKeyErrorHandler)
-app.use(defaultErrorHandler)
-app.use(notFoundHandler)
+app.use(errorLogger);
+app.use(validationErrorHandler);
+app.use(castErrorHandler);
+app.use(duplicateKeyErrorHandler);
+app.use(defaultErrorHandler);
+app.use(notFoundHandler);
+
+app.use(userRoutes);
 
 const server = app.listen(config.port);
 

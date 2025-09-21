@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 import config from './config';
-async function connectDB () {
+async function connectDB () : Promise<void> {
     try {
-        const conn = await mongoose.connect(config.db_connection_string);
+        const conn = await mongoose.connect(config.dbConnectionString);
 
         console.log(`MongoDB Connected: ${conn.connection.host}`);
         console.log(`Database: ${conn.connection.name}`);
