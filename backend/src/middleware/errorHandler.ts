@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from 'express';
-import { MongoError } from 'mongodb';
+import {Request, Response, NextFunction, RequestHandler} from 'express';
+import {MongoError} from 'mongodb';
 import mongoose from 'mongoose';
 import config from "backend/configuration/config"
 
@@ -11,38 +11,48 @@ export function errorLogger(err: Error, req: Request, res: Response, next: NextF
     next(err);
 }
 
-export function validationErrorHandler(err: mongoose.Error.ValidationError, req: Request, res: Response, next: NextFunction): void {
-    const message = Object.values(err.errors)
-        .map((val) => val.message)
-        .join(', ');
+export function validationErrorHandler(err: Error, req: Request, res: Response, next: NextFunction): void {
 
-    res.status(400).json({
-        success: false,
-        error: 'Validation Error',
-        message
-    });
-}
+    if (err instanceof mongoose.Error.ValidationError)
+    {
+        const message = Object.values(err.errors)
+            .map((val) => val.message)
+            .join(', ');
 
-export function castErrorHandler(err: mongoose.Error.CastError, req: Request, res: Response, next: NextFunction): void {
-    res.status(400).json({
-        success: false,
-        error: 'Invalid ID',
-        message: 'Invalid ID format'
-    });
-}
-
-
-export function duplicateKeyErrorHandler(err: MongoError, req: Request, res: Response, next: NextFunction) {
-    const field = (err as any).keyValue ? Object.keys((err as any).keyValue)[0] : 'unknown';
-    const message = `Duplicate value for field: ${field}`;
-
-    return (req: Request, res: Response, next: NextFunction) => {
-        res.status(409).json({
+        res.status(400).json({
             success: false,
-            error: 'Duplicate Entry',
-            message
+            error: 'Validation Error',
+            message: err.message,
         });
     }
+    next(err);
+
+}
+
+export function castErrorHandler(err: Error, req: Request, res: Response, next: NextFunction): void {
+    if (err instanceof mongoose.Error.CastError) {
+        res.status(400).json({
+            success: false,
+            error: 'Bad Request',
+            message: err.message,
+        });
+    }
+    next(err);
+}
+
+
+export function duplicateKeyErrorHandler(err: Error, req: Request, res: Response, next: NextFunction): void {
+  if (err instanceof MongoError && err.code == 11000) {
+      const field = (err as any).keyValue ? Object.keys((err as any).keyValue)[0] : 'unknown';
+      const message = `Duplicate value for field: ${field}`;
+
+      res.status(409).json({
+          success: false,
+          error: 'Duplicate Entry',
+          message: message
+      });
+  }
+    next(err);
 }
 
 
@@ -50,6 +60,6 @@ export function defaultErrorHandler(err: Error, req: Request, res: Response, nex
     res.status(500).json({
         success: false,
         error: err.message || 'Server Error',
-        ...(config.environment === 'development' && { stack: err.stack })
+        ...(config.environment === 'development' && {stack: err.stack})
     });
 }

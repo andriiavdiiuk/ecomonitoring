@@ -29,16 +29,16 @@ app.use((req, res, next) => {
     console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
     next();
 });
-
-
+app.use(userRoutes);
 app.use(errorLogger);
 app.use(validationErrorHandler);
 app.use(castErrorHandler);
 app.use(duplicateKeyErrorHandler);
 app.use(defaultErrorHandler);
-app.use(notFoundHandler);
 
-app.use(userRoutes);
+
+
+app.use(notFoundHandler);
 
 const server = app.listen(config.port);
 

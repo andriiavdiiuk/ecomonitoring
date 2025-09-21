@@ -7,9 +7,9 @@ import jwt from 'jsonwebtoken';
 
 export default class UserService
 {
-    async createUser(user: User,): Promise<string>
+    async createUser(user: User): Promise<string>
     {
-        const salt = crypto.randomBytes(length);
+        const salt = crypto.randomBytes(16);
         user.password = await argon2id.hash(
             user.password,
             {

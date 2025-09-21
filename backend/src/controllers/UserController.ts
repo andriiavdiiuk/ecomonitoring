@@ -1,8 +1,10 @@
 import UserService from "backend/services/UserService";
 import {User} from "backend/dal/entities/User";
-import express, { Request, Response} from "express";
+import express, {Request, Response} from "express";
+
 class UserController {
     private readonly userService: UserService;
+
     constructor(userService: UserService) {
         this.userService = userService;
     }
@@ -16,6 +18,7 @@ class UserController {
             success: true,
             token,
         });
+
     }
 }
 
