@@ -4,6 +4,7 @@ import argon2id from "argon2";
 import crypto from "crypto";
 import config from "backend/configuration/config";
 import jwt from 'jsonwebtoken';
+import { ObjectId } from 'mongodb';
 
 export default class UserService
 {
@@ -26,7 +27,7 @@ export default class UserService
             },
             config.jwt.secret,
             {
-                subject: user.id.toString(),
+                subject: (user.id as ObjectId).toString(),
                 expiresIn: config.jwt.expires
             }
         );

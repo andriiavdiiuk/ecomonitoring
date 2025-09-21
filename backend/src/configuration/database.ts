@@ -1,13 +1,14 @@
 import mongoose from 'mongoose';
 import config from './config';
-async function connectDB () : Promise<void> {
+
+async function connectDB(): Promise<void> {
     try {
         const conn = await mongoose.connect(config.dbConnectionString);
 
         console.log(`MongoDB Connected: ${conn.connection.host}`);
         console.log(`Database: ${conn.connection.name}`);
-    } catch (error: any) {
-        console.error('MongoDB connection error:', error.message);
+    } catch (error: unknown) {
+        console.error('MongoDB connection error:', (error as Error).message);
         process.exit(1);
     }
 }
@@ -24,10 +25,16 @@ mongoose.connection.on('disconnected', () => {
     console.log('Mongoose disconnected from MongoDB');
 });
 
-process.on('SIGINT', async () => {
-    await mongoose.connection.close();
-    console.log('MongoDB connection closed due to app termination');
-    process.exit(0);
+process.on('SIGINT', () => {
+    mongoose.connection.close()
+        .then(() => {
+            console.log('MongoDB connection closed due to app termination');
+            process.exit(0);
+        })
+        .catch((err: unknown) => {
+            console.error('Error closing MongoDB connection:', err);
+            process.exit(1);
+        });
 });
 
 

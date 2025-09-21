@@ -15,7 +15,7 @@ import userRoutes from "backend/routes/UserRoutes";
 
 const app = express();
 
-connectDB();
+await connectDB();
 
 app.use(helmet())
 

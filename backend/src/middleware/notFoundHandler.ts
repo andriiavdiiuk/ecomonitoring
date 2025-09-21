@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 
-export function notFoundHandler(req: Request, res: Response, next: NextFunction) {
+export function notFoundHandler(req: Request, res: Response) {
         return res.status(404).json({
             success: false,
             error: 'Not Found',

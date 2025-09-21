@@ -1,4 +1,4 @@
-import express, {Request, Response} from "express";
+import express from "express";
 import UserController from "backend/controllers/UserController";
 import UserService from "backend/services/UserService";
 

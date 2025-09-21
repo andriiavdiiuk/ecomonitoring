@@ -1,6 +1,6 @@
 import UserService from "backend/services/UserService";
 import {User} from "backend/dal/entities/User";
-import express, {Request, Response} from "express";
+import {Request, Response} from "express";
 
 class UserController {
     private readonly userService: UserService;
@@ -11,7 +11,7 @@ class UserController {
 
     async register(req: Request, res: Response) {
 
-        const data: any = req.body;
+        const data: User = req.body as User;
         const token = await this.userService.createUser(data);
 
         return res.status(201).json({

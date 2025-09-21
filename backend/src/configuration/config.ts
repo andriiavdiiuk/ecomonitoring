@@ -42,7 +42,7 @@ const config: Config = {
     }
 }
 
-function requireEnv(key: any): string {
+function requireEnv(key: string): string {
     const value = process.env[key];
     if (value === undefined || value.trim() === "") {
         throw new Error(`Environment variable is invalid: ${key}`);
