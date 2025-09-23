@@ -4,11 +4,8 @@ import cors from 'cors';
 import config from 'backend/configuration/config'
 import connectDB from 'backend/configuration/database'
 import {
-    castErrorHandler,
-    defaultErrorHandler,
-    duplicateKeyErrorHandler,
+    errorHandler,
     errorLogger,
-    validationErrorHandler
 } from "backend/middleware/errorHandler";
 import {notFoundHandler} from "backend/middleware/notFoundHandler";
 import userRoutes from "backend/routes/UserRoutes";
@@ -31,11 +28,7 @@ app.use((req, res, next) => {
 });
 app.use(userRoutes);
 app.use(errorLogger);
-app.use(validationErrorHandler);
-app.use(castErrorHandler);
-app.use(duplicateKeyErrorHandler);
-app.use(defaultErrorHandler);
-
+app.use(errorHandler);
 
 
 app.use(notFoundHandler);

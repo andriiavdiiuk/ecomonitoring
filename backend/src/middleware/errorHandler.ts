@@ -1,9 +1,35 @@
 import {Request, Response, NextFunction} from 'express';
 import {MongoServerError} from 'mongodb';
 import mongoose from 'mongoose';
-import config from "backend/configuration/config"
+import jwt from "jsonwebtoken";
+import {STATUS_CODES} from "http";
+import config from "backend/configuration/config";
 
-export function errorLogger(err: mongoose.Error, req: Request, res: Response, next: NextFunction):void {
+interface ProblemDetail {
+    type: string;
+    status: number;
+    title: string;
+    detail: string;
+    instance: string;
+    errors?: Array<Record<string, string>>;
+}
+
+export function getProblemDetail(req: Request, status: number, detail: string, errors?: Array<Record<string, string>>): ProblemDetail {
+    return {
+        type: "about:blank",
+        status: status,
+        title: STATUS_CODES[status] as string,
+        detail: detail,
+        instance: req.originalUrl,
+        ...(errors ? {errors} : {})
+    }
+}
+
+export function sendProblemDetail(req: Request, res: Response, status: number, detail: string, errors?: Array<Record<string, string>>) : Response {
+    return res.status(status).json(getProblemDetail(req, status, detail, errors));
+}
+
+export function errorLogger(err: mongoose.Error, req: Request, res: Response, next: NextFunction): void {
     console.error(`Error occurred at ${new Date().toISOString()}:`);
     console.error(`Path: ${req.method} ${req.path}`);
     console.error(`Error: ${err.message}`);
@@ -11,56 +37,38 @@ export function errorLogger(err: mongoose.Error, req: Request, res: Response, ne
     next(err);
 }
 
-export function validationErrorHandler(err: mongoose.Error, req: Request, res: Response, next: NextFunction): void {
+export function errorHandler(err: Error, req: Request, res: Response, next: NextFunction): Response {
+    switch (true) {
+        case err instanceof mongoose.Error.ValidationError: {
+            const errors = Object.values(err.errors).map(e => ({ [e.path]: e.message }));
+            return sendProblemDetail(req, res, 422, "Validation Error", errors);
+        }
 
-    if (err instanceof mongoose.Error.ValidationError)
-    {
-        const message = Object.values(err.errors)
-            .map((val) => val.message)
-            .join(', ');
+        case err instanceof mongoose.Error.CastError: {
+            return sendProblemDetail(req, res, 400, err.message);
+        }
 
-        res.status(400).json({
-            success: false,
-            error: 'Validation Error',
-            message: message,
-        });
+        case err instanceof MongoServerError && err.code === 11000: {
+            const field = Object.keys(err.keyValue as object)[0] ?? 'unknown';
+            const errors = [{ [field]: "Duplicate value" }];
+            return sendProblemDetail(req, res, 409, "Duplicate value", errors);
+        }
+
+        case err instanceof jwt.TokenExpiredError: {
+            return sendProblemDetail(req, res, 401, "Token expired");
+        }
+
+        case err instanceof jwt.JsonWebTokenError: {
+            return sendProblemDetail(req, res, 403, "Token is invalid");
+        }
+
+        default: {
+            let detail = STATUS_CODES[500] as string;
+            if (config.environment === "development")
+            {
+                detail = err.message;
+            }
+            return sendProblemDetail(req, res, 500, detail);
+        }
     }
-    next(err);
-
-}
-
-export function castErrorHandler(err: mongoose.Error, req: Request, res: Response, next: NextFunction): void {
-    if (err instanceof mongoose.Error.CastError) {
-        res.status(400).json({
-            success: false,
-            error: 'Bad Request',
-            message: err.message,
-        });
-    }
-    next(err);
-}
-
-
-export function duplicateKeyErrorHandler(err: mongoose.Error, req: Request, res: Response, next: NextFunction): void {
-  if (err instanceof MongoServerError && err.code == 110200) {
-      const field = Object.keys(err.keyValue as object)[0] ?? 'unknown';
-      const message = `Duplicate value for field: ${field}`;
-
-      res.status(409).json({
-          success: false,
-          error: 'Duplicate Entry',
-          message: message
-      });
-  }
-    next(err);
-}
-
-
-
-export function defaultErrorHandler(err: Error, req: Request, res: Response, _next: NextFunction): void {
-    res.status(500).json({
-        success: false,
-        error: err.message || 'Server Error',
-        ...(config.environment === 'development' && {stack: err.stack})
-    });
 }
