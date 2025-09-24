@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import jwt from "jsonwebtoken";
 import {STATUS_CODES} from "http";
 import config from "backend/configuration/config";
+import ValidationError from "backend/errors/validationError";
 
 interface ProblemDetail {
     type: string;
@@ -11,10 +12,10 @@ interface ProblemDetail {
     title: string;
     detail: string;
     instance: string;
-    errors?: Array<Record<string, string>>;
+    errors?: Array<Partial<Record<string, string|object>>>;
 }
 
-export function getProblemDetail(req: Request, status: number, detail: string, errors?: Array<Record<string, string>>): ProblemDetail {
+export function getProblemDetail(req: Request, status: number, detail: string, errors?: Array<Partial<Record<string, string|object>>>): ProblemDetail {
     return {
         type: "about:blank",
         status: status,
@@ -25,7 +26,7 @@ export function getProblemDetail(req: Request, status: number, detail: string, e
     }
 }
 
-export function sendProblemDetail(req: Request, res: Response, status: number, detail: string, errors?: Array<Record<string, string>>) : Response {
+export function sendProblemDetail(req: Request, res: Response, status: number, detail: string, errors?: Array<Partial<Record<string, string|object>>>) : Response {
     return res.status(status).json(getProblemDetail(req, status, detail, errors));
 }
 
@@ -39,6 +40,14 @@ export function errorLogger(err: mongoose.Error, req: Request, res: Response, ne
 
 export function errorHandler(err: Error, req: Request, res: Response, next: NextFunction): Response {
     switch (true) {
+        case err instanceof SyntaxError && 'body' in err: {
+            return sendProblemDetail(req, res, 400, "Invalid JSON body", [{ body: err.message }]);
+        }
+
+        case err instanceof ValidationError: {
+            return sendProblemDetail(req, res, 400, err.message, err.fieldErrors)
+        }
+
         case err instanceof mongoose.Error.ValidationError: {
             const errors = Object.values(err.errors).map(e => ({ [e.path]: e.message }));
             return sendProblemDetail(req, res, 422, "Validation Error", errors);

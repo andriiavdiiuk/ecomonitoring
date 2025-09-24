@@ -2,6 +2,7 @@ import UserService from "backend/services/UserService";
 import {User} from "backend/dal/entities/User";
 import {Request, Response} from "express";
 import {AuthenticatedRequest} from "backend/middleware/authMiddleware";
+import {LoginUserDto, RegisterUserDto} from "backend/validation/schemas/userSchemas";
 
 class UserController {
     private readonly userService: UserService;
@@ -10,20 +11,23 @@ class UserController {
         this.userService = userService;
     }
 
-    async register(req: Request, res: Response) {
-
-        const data: User = req.body as User;
+    async register(req: Request, res: Response): Promise<Response> {
+        const data: RegisterUserDto = req.body as RegisterUserDto;
         const token = await this.userService.createUser(data);
 
         return res.status(201).json({
-            success: true,
             token,
         });
-
     }
 
-    testJwt(req: AuthenticatedRequest, res: Response) {
-        return res.status(200).json(req.user);
+    async login(req: Request, res: Response) : Promise<Response>
+    {
+        const data: LoginUserDto = req.body as LoginUserDto;
+        const token = await this.userService.loginUser(data);
+
+        return res.status(201).json({
+            token: token
+        });
     }
 }
 

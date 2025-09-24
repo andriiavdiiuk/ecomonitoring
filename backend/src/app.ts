@@ -10,6 +10,7 @@ import {
 import {notFoundHandler} from "backend/middleware/notFoundHandler";
 import userRoutes from "backend/routes/UserRoutes";
 
+
 const app = express();
 
 await connectDB();
