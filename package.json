@@ -5,7 +5,10 @@
   "main": "backend/app.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tsx backend/src/app.ts"
+    "dev": "tsx backend/src/app.ts",
+    "build": "tsc -p tsconfig.json && tsc-alias",
+    "run": "node dist/backend/src/app.js",
+    "build_and_run": "npm run build && npm run run"
   },
   "private": true,
   "dependencies": {
@@ -21,6 +24,7 @@
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.18.1",
+    "tsc-alias": "^1.8.16",
     "zod": "^4.1.11"
   },
   "type": "module",

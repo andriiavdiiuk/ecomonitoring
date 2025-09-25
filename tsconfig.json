@@ -11,11 +11,20 @@
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "rootDir": ".",
+    "outDir": "./dist",
     "paths": {
       "*": ["./node_modules/*"],
-      "backend/*": ["backend/src/*"]
+      "backend/*": ["backend/src/*"],
     }
   },
   "include": ["./backend/**/*.ts"],
   "exclude": ["node_modules"],
+  "tsc-alias": {
+    "verbose": false,
+    "resolveFullPaths": true,
+    "fileExtensions": {
+      "inputGlob": "{js,jsx,mjs}",
+      "outputCheck": ["js", "json", "jsx", "mjs"]
+    }
+  }
 }
