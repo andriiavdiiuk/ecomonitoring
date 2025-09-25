@@ -2,21 +2,35 @@ import {NextFunction, Request, Response} from "express";
 import {JwtPayload} from "jsonwebtoken";
 import {sendProblemDetail} from "backend/api/middleware/errorHandler";
 import {verifyJwt} from "backend/api/security/jwtUtils";
+import {Roles} from "backend/dal/entities/Roles";
+import UserRepository from "backend/dal/repositories/UserRepository";
 
 export interface AuthenticatedRequest extends Request {
-    user?: string | JwtPayload;
+    user?: JwtPayload;
 }
 
-export function authMiddleware(req: AuthenticatedRequest, res: Response, next: NextFunction){
-    const header: string | undefined = req.headers.authorization;
+export function authMiddleware(userRepository: UserRepository, allowedRoles?: Roles[]) {
+    return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+        const header: string | undefined = req.headers.authorization;
 
-    if (!header || !header.startsWith("Bearer ")) {
-        return sendProblemDetail(req,res,401,"Authorization header missing or malformed");
-    }
+        if (!header || !header.startsWith("Bearer ")) {
+            return sendProblemDetail(req, res, 401, "Authorization header missing or malformed");
+        }
 
-    const token: string = header.split(" ")[1];
+        const token: string = header.split(" ")[1];
+        const payload = verifyJwt(token) as JwtPayload;
+        
+        if (!payload.roles || typeof payload.roles !== "string") {
+            return sendProblemDetail(req, res, 401, "Invalid token");
+        }
+        const userRoles: string[] = payload.roles.split(",").map(r => r.trim());
 
-    req.user = verifyJwt(token);
+        if (allowedRoles && !userRoles.some(role => allowedRoles.includes(role as Roles))) {
+            return sendProblemDetail(req, res, 403, "Access denied");
+        }
 
-    next();
+        req.user = payload;
+
+        next();
+    };
 }

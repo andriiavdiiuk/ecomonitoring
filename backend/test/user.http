@@ -1,5 +1,6 @@
 POST http://localhost:3000/api/sync
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QxMmYzNjU2NzUxeTQiLCJyb2xlcyI6InVzZXIiLCJpYXQiOjE3NTg4MTUxNzAsImV4cCI6MTc1ODgyNTI1MCwic3ViIjoiNjhkNTYzYzI5Yzg0MjJjZWUwYjNlNGQ3In0.JKW2pHYR70SBt053vn9nQo1ZhvAwEsI05-aRLOSCi_I
 
 {}
 
@@ -25,8 +26,8 @@ POST http://localhost:3000/api/user/register
 Content-Type: application/json
 
 {
-  "username": "test12f35675y4",
-  "email": "tets44ft@test.com",
+  "username": "test12f3656751y4",
+  "email": "tets4146ft@test.com",
   "password": "passwordT1"
 }
 
@@ -36,8 +37,8 @@ POST http://localhost:3000/api/user/login
 Content-Type: application/json
 
 {
-  "username": "test1235675y",
-  "password": "passwor1"
+  "username": "tets414ft@test.com",
+  "password": "passwordT1"
 
 }
 
