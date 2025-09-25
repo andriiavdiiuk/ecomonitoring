@@ -1,8 +1,7 @@
 import {NextFunction, Request, Response} from "express";
-import config from "backend/configuration/config";
-import jwt, {JwtPayload} from "jsonwebtoken";
-import {sendProblemDetail} from "backend/middleware/errorHandler";
-import {verifyJwt} from "backend/security/jwtUtils";
+import {JwtPayload} from "jsonwebtoken";
+import {sendProblemDetail} from "backend/api/middleware/errorHandler";
+import {verifyJwt} from "backend/api/security/jwtUtils";
 
 export interface AuthenticatedRequest extends Request {
     user?: string | JwtPayload;

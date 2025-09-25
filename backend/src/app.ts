@@ -1,14 +1,14 @@
 import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
-import config from 'backend/configuration/config'
-import connectDB from 'backend/configuration/database'
+import config from 'backend/api/configuration/config'
+import connectDB from 'backend/api/configuration/database'
 import {
     errorHandler,
     errorLogger,
-} from "backend/middleware/errorHandler";
-import {notFoundHandler} from "backend/middleware/notFoundHandler";
-import userRoutes from "backend/routes/UserRoutes";
+} from "backend/api/middleware/errorHandler";
+import {notFoundHandler} from "backend/api/middleware/notFoundHandler";
+import userRoutes from "backend/api/routes/UserRoutes";
 
 
 const app = express();

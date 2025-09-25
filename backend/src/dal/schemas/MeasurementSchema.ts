@@ -43,4 +43,6 @@ MeasurementSchema.index({'pollutants.pollutant': 1, measurement_time: -1});
 
 MeasurementSchema.index({station_id: 1, measurement_time: 1}, {unique: true});
 
-export default mongoose.model<MeasurementDocument>('MeasurementModel', MeasurementSchema);
+const MeasurementModel = mongoose.model<MeasurementDocument>('MeasurementModel', MeasurementSchema);
+
+export default MeasurementModel;

@@ -32,5 +32,5 @@ const PollutantSchema = new mongoose.Schema<PollutantDocument>(
     { _id: false }
 );
 
-
-export default mongoose.model<PollutantDocument>('PollutantModel',PollutantSchema);
+const PollutantModel = mongoose.model<PollutantDocument>('PollutantModel',PollutantSchema);
+export default PollutantModel;

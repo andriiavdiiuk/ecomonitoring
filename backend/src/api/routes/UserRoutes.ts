@@ -1,8 +1,8 @@
 import express from "express";
-import UserController from "backend/controllers/UserController";
-import UserServiceImpl from "backend/services/impl/UserServiceImpl";
-import {validationMiddleware} from "backend/middleware/validationMiddleware";
-import {loginUserSchemas, registerUserSchema} from "backend/validation/schemas/userSchemas";
+import UserController from "backend/api/controllers/UserController";
+import UserServiceImpl from "backend/bll/services/impl/UserServiceImpl";
+import {validationMiddleware} from "backend/api/middleware/validationMiddleware";
+import {loginUserSchemas, registerUserSchema} from "backend/api/validation/schemas/userSchemas";
 import UserRepositoryImpl from "backend/dal/repositories/impl/UserRepositoryImpl";
 
 const userRoutes = express.Router();

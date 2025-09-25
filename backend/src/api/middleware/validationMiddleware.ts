@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response} from "express";
 import {z} from "zod";
-import {sendProblemDetail} from "backend/middleware/errorHandler";
+import {sendProblemDetail} from "backend/api/middleware/errorHandler";
 
 export function validationMiddleware(schema: z.ZodType, source: 'body' | 'query' | 'params' = 'body') {
     return (req: Request, res: Response, next: NextFunction) => {

@@ -3,8 +3,8 @@ import {MongoServerError} from 'mongodb';
 import mongoose from 'mongoose';
 import jwt from "jsonwebtoken";
 import {STATUS_CODES} from "http";
-import config from "backend/configuration/config";
-import ValidationError from "backend/errors/validationError";
+import config from "backend/api/configuration/config";
+import ValidationError from "backend/bll/errors/validationError";
 
 interface ProblemDetail {
     type: string;

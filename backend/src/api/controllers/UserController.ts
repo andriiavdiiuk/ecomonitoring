@@ -1,8 +1,6 @@
-import {User} from "backend/dal/entities/User";
 import {Request, Response} from "express";
-import {AuthenticatedRequest} from "backend/middleware/authMiddleware";
-import {LoginUserDto, RegisterUserDto} from "backend/validation/schemas/userSchemas";
-import UserService from "backend/services/UserService";
+import {LoginUserDto, RegisterUserDto} from "backend/api/validation/schemas/userSchemas";
+import UserService from "backend/bll/services/UserService";
 
 class UserController {
     private readonly userService: UserService;

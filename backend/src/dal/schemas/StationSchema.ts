@@ -92,4 +92,6 @@ StationSchema.index({ location: '2dsphere' });
 StationSchema.index({ city_name: 1, status: 1 });
 StationSchema.index({ 'metadata.last_measurement': -1 });
 
-export default mongoose.model<StationDocument>('StationModel', StationSchema);
+const StationModel = mongoose.model<StationDocument>('StationModel', StationSchema);
+
+export default StationModel;
