@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import argon2id from "argon2";
-import config from "backend/configuration/config";
+import config from "backend/api/configuration/config";
 
 export async function encryptPassword(password: string): Promise<string>
 {

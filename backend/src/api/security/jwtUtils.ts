@@ -1,7 +1,6 @@
 import {User} from "backend/dal/entities/User";
 import jwt, {JwtPayload} from "jsonwebtoken";
-import config from "backend/configuration/config";
-import {ObjectId} from "mongodb";
+import config from "backend/api/configuration/config";
 
 export function getJwt(user: User): string {
     return jwt.sign(
@@ -11,7 +10,7 @@ export function getJwt(user: User): string {
         },
         config.jwt.secret,
         {
-            subject: (user.id as ObjectId).toString(),
+            subject: user.id,
             expiresIn: config.jwt.expires
         }
     );

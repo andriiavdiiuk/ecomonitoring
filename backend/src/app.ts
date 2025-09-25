@@ -9,6 +9,7 @@ import {
 } from "backend/api/middleware/errorHandler";
 import {notFoundHandler} from "backend/api/middleware/notFoundHandler";
 import userRoutes from "backend/api/routes/UserRoutes";
+import saveEcoBotRoutes from "backend/api/routes/SaveEcoBotRoutes";
 
 
 const app = express();
@@ -28,6 +29,7 @@ app.use((req, res, next) => {
     next();
 });
 app.use(userRoutes);
+app.use(saveEcoBotRoutes);
 app.use(errorLogger);
 app.use(errorHandler);
 
