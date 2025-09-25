@@ -6,6 +6,6 @@ export default interface Repository<T, K = string> {
     findAll(): Promise<T[]>;
     delete(id: K): Promise<boolean>;
 
-    findBy(query: Partial<Record<keyof T, unknown>>) : Promise<T[] | null>
-    findOneBy(query: Partial<Record<keyof T, unknown>>) : Promise<T | null>
+    findBy(query: Partial<{ [P in keyof T]: T[P] }>) : Promise<T[] | null>
+    findOneBy(query:Partial<{ [P in keyof T]: T[P] }>) : Promise<T | null>
 }

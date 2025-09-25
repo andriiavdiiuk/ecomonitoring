@@ -32,12 +32,12 @@ export abstract class MongoCrudRepository<T , K = string> implements Repository<
         return res.deletedCount === 1;
     }
 
-    async findBy(query: Partial<Record<keyof T, unknown>>) : Promise<T[] | null>
+    async findBy(query: Partial<{ [P in keyof T]: T[P] }>) : Promise<T[] | null>
     {
         return await this.model.findOne(query as never).exec() as T[] | null;
     }
 
-    async findOneBy(query: Partial<Record<keyof T, unknown>>) : Promise<T | null>
+    async findOneBy(query: Partial<{ [P in keyof T]: T[P] }>) : Promise<T | null>
     {
         return await this.model.findOne(query as never).exec();
     }

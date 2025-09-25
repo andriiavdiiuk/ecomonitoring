@@ -68,7 +68,7 @@ export default class SaveEcoBotServiceImpl implements SaveEcoBotService {
                     platform_name: stationData.platformName,
                     measured_parameters: stationData.pollutants.map(p => p.pol)
                 };
-                const station: Station | null = await this.stationRepository.find(<string>stationInfo.station_id)
+                const station: Station | null = await this.stationRepository.findOneBy({station_id: stationInfo.station_id})
                 if (!station) {
                     await this.stationRepository.create(stationInfo);
                     results.stations_created++;
