@@ -1,11 +1,16 @@
 import StationRepository from "backend/dal/repositories/StationRepository";
 import Station from "backend/dal/entities/Station";
-import StationModel from "backend/dal/schemas/StationSchema";
+import {MongoCrudRepository} from "backend/dal/repositories/MongoCrudRepository";
+import StationModel, {StationDocument} from "backend/dal/schemas/StationSchema";
 
-export default class StationRepositoryImpl implements StationRepository {
-    public async updateLastMeasurement(station_id: string): Promise<void>{
-        await StationModel.updateOne(
-            { station_id },
+export default class StationRepositoryImpl extends MongoCrudRepository<StationDocument> implements StationRepository {
+
+    constructor() {
+        super(StationModel);
+    }
+    public async updateLastMeasurement(station_id: string): Promise<void> {
+        await this.model.updateOne(
+            {station_id},
             {
                 $set: {
                     'metadata.last_measurement': new Date(),
@@ -16,7 +21,7 @@ export default class StationRepositoryImpl implements StationRepository {
     }
 
     public async findNearby(longitude: number, latitude: number, maxDistance: number): Promise<Station[]> {
-        return await StationModel.find({
+        return await this.model.find({
             location: {
                 $near: {
                     $geometry: {

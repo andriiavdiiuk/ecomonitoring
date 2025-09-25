@@ -1,0 +1,44 @@
+import { Model} from 'mongoose';
+import Repository from "backend/dal/repositories/Repository";
+export abstract class MongoCrudRepository<T , K = string> implements Repository<T, K> {
+    protected readonly model: Model<T>;
+    constructor(model: Model<T>) {
+        this.model = model;
+    }
+
+    async create(item: Partial<T>): Promise<T> {
+        return await this.model.create(item);
+    }
+
+    async update(id: K, item: Partial<T>): Promise<T | null> {
+        return await this.model.findOneAndUpdate({ id }, item, { new: true }).exec();
+    }
+
+    async find(id: K): Promise<T | null> {
+        return await this.model.findOne({ id }).exec();
+    }
+
+    async exists(id: K): Promise<boolean> {
+        const result = await this.model.exists({ id }).exec();
+        return !!result;
+    }
+
+    async findAll(): Promise<T[]> {
+        return await this.model.find().exec();
+    }
+
+    async delete(id: K): Promise<boolean> {
+        const res = await this.model.deleteOne({ id }).exec();
+        return res.deletedCount === 1;
+    }
+
+    async findBy(query: Partial<Record<keyof T, unknown>>) : Promise<T[] | null>
+    {
+        return await this.model.findOne(query as never).exec() as T[] | null;
+    }
+
+    async findOneBy(query: Partial<Record<keyof T, unknown>>) : Promise<T | null>
+    {
+        return await this.model.findOne(query as never).exec();
+    }
+}

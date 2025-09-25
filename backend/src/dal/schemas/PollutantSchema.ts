@@ -3,7 +3,7 @@ import {AveragingPeriod, MeasuredParameters, Pollutant, QualityFlag, Unit} from 
 
 export interface PollutantDocument extends Pollutant, Document {}
 
-const PollutantSchema = new mongoose.Schema<PollutantDocument>(
+export const PollutantSchema = new mongoose.Schema<PollutantDocument>(
     {
         pollutant: {
             type: String,

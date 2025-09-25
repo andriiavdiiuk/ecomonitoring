@@ -1,10 +1,10 @@
 import {User} from 'backend/dal/entities/User';
-import {encryptPassword, verifyPassword} from "backend/security/passwordUtils";
-import {getJwt} from "backend/security/jwtUtils";
-import {LoginUserDto, RegisterUserDto} from "backend/validation/schemas/userSchemas";
-import ValidationError from "backend/errors/validationError";
+import {encryptPassword, verifyPassword} from "backend/api/security/passwordUtils";
+import {getJwt} from "backend/api/security/jwtUtils";
+import {LoginUserDto, RegisterUserDto} from "backend/api/validation/schemas/userSchemas";
+import ValidationError from "backend/bll/errors/validationError";
 import UserRepository from "backend/dal/repositories/UserRepository";
-import UserService from "backend/services/UserService";
+import UserService from "backend/bll/services/UserService";
 
 export default class UserServiceImpl implements UserService
 {

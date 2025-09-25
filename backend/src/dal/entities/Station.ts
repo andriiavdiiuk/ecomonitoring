@@ -15,11 +15,11 @@ export default interface Station{
     timezone: string,
     geolocation: {
         type: string,
-        coordinates: [number],
+        coordinates: number[],
     },
     platform_name: string,
     status: Status,
-    measured_parameters: MeasuredParameters,
+    measured_parameters: MeasuredParameters[],
     metadata: {
         created_at: Date
         updated_at: Date

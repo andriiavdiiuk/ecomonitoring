@@ -9,7 +9,7 @@ export interface Measurement {
     metadata: {
         source: string;
         import_time: Date;
-        original_data?: Date;
+        original_data?: unknown;
         processing_notes?: string;
     };
 }

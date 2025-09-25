@@ -1,11 +1,13 @@
 import {Measurement} from "backend/dal/entities/Measurement";
-import {MeasurementStats, Severity, ThresholdExceedance} from "backend/dal/repositories/MeasurementRepository";
+import MeasurementRepository, {MeasurementStats, Severity, ThresholdExceedance} from "backend/dal/repositories/MeasurementRepository";
 import {MeasuredParameters} from "backend/dal/entities/Pollutant";
-import MeasurementModel from "backend/dal/schemas/MeasurementSchema"
+import {MongoCrudRepository} from "backend/dal/repositories/MongoCrudRepository";
+import MeasurementModel, {MeasurementDocument} from "backend/dal/schemas/MeasurementSchema";
 
-export class MeasurementRepository implements MeasurementRepository {
-
-    // Instance logic moved here
+export class MeasurementRepositoryImpl extends MongoCrudRepository<MeasurementDocument> implements MeasurementRepository {
+    constructor() {
+        super(MeasurementModel);
+    }
     public checkThresholds(measurement: Measurement): ThresholdExceedance[] {
         const thresholds: Partial<Record<MeasuredParameters, { warning: number; alert: number; emergency: number }>> = {
             [MeasuredParameters.PM25]: {warning: 25, alert: 35, emergency: 75},
@@ -39,7 +41,7 @@ export class MeasurementRepository implements MeasurementRepository {
     }
 
     public async getLatestByStation(stationId: string): Promise<Measurement | null> {
-        return await MeasurementModel.findOne({station_id: stationId})
+        return await this.model.findOne({station_id: stationId})
             .sort({measurement_time: -1})
             .exec();
     }
@@ -56,7 +58,7 @@ export class MeasurementRepository implements MeasurementRepository {
             'pollutants.pollutant': pollutant,
         };
 
-        return await MeasurementModel.aggregate([
+        return await this.model.aggregate([
             {$match: matchStage},
             {$unwind: '$pollutants'},
             {$match: {'pollutants.pollutant': pollutant}},

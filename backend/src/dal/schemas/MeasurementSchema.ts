@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import {Measurement} from "backend/dal/entities/Measurement";
 import {Status} from "backend/dal/entities/Station";
+import PollutantModel from "backend/dal/schemas/PollutantSchema";
 import PollutantSchema from "backend/dal/schemas/PollutantSchema";
 
 export interface MeasurementDocument extends Measurement, Document {}
@@ -21,7 +22,7 @@ const MeasurementSchema = new mongoose.Schema<MeasurementDocument>({
             required: true,
             index: true
         },
-        pollutants: [PollutantSchema],
+        pollutants: [PollutantSchema.schema],
         metadata: {
             source: {
                 type: String,

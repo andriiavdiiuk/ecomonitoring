@@ -1,4 +1,6 @@
 import {Measurement} from "backend/dal/entities/Measurement";
+import Repository from "backend/dal/repositories/Repository";
+import Station from "backend/dal/entities/Station";
 
 export enum Severity {
     Normal = "normal",
@@ -23,7 +25,7 @@ export type MeasurementStats = {
     latest: Date;
 };
 
-export default  interface MeasurementRepository {
+export default interface MeasurementRepository extends Repository<Measurement> {
     checkThresholds(measurement: Measurement): ThresholdExceedance[];
     getLatestByStation(stationId: string): Promise<Measurement | null>;
     getStatistics(
