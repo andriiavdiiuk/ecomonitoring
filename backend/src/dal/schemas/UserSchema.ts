@@ -2,7 +2,9 @@ import mongoose from 'mongoose'
 import { User } from "backend/dal/entities/User";
 import { Roles } from "backend/dal/entities/Roles";
 
-const UserSchema = new mongoose.Schema<User>({
+export interface UserDocument extends User, Document {}
+
+const UserSchema = new mongoose.Schema<UserDocument>({
     username: {
         type: String,
         unique:  true,
@@ -35,4 +37,4 @@ const UserSchema = new mongoose.Schema<User>({
 });
 
 
-export default mongoose.model('UserModel',UserSchema);
+export default mongoose.model<UserDocument>('UserModel',UserSchema);
