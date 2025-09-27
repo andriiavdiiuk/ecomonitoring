@@ -53,6 +53,6 @@ export const NearbyStationsParamsSchema = z.object({
 
 export type StationDTO = z.infer<typeof StationSchema>;
 export type UpdateStationDTO = z.infer<typeof UpdateStationSchema>;
-export type GetStationsQueryDTO = z.infer<typeof GetStationsQuerySchema>
-export type StationIdParamsDTO = z.infer<typeof StationIdParamsSchema>
-export type NearbyStationsParamsDTO = z.infer<typeof NearbyStationsParamsSchema>
+export type GetStationsDTO = z.infer<typeof GetStationsQuerySchema>
+export type StationIdDTO = z.infer<typeof StationIdParamsSchema>
+export type NearbyStationsDTO = z.infer<typeof NearbyStationsParamsSchema>

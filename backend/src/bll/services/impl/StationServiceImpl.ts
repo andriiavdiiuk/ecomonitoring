@@ -1,8 +1,8 @@
 import StationService from "backend/bll/services/StationService";
-import Station, {Status} from "backend/dal/entities/Station";
+import Station from "backend/dal/entities/Station";
 import StationRepository from "backend/dal/repositories/StationRepository";
 import {PaginationResult} from "backend/bll/services/Results";
-import {StationDTO} from "backend/bll/validation/schemas/stationSchemas";
+import {GetStationsDTO, StationDTO} from "backend/bll/validation/schemas/stationSchemas";
 
 export class StationServiceImpl implements StationService {
     private readonly stationRepository: StationRepository
@@ -12,12 +12,7 @@ export class StationServiceImpl implements StationService {
 
     }
 
-    async getStations(filter: {
-        city?: string;
-        status?: Status;
-        page?: number;
-        limit?: number;
-    }): Promise<PaginationResult<Station[]>> {
+    async getStations(filter: GetStationsDTO): Promise<PaginationResult<Station[]>> {
         const page = filter.page ?? 1;
         const limit = filter.limit ?? 50;
 

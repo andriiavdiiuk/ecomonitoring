@@ -1,11 +1,11 @@
-import Station, {Status} from "backend/dal/entities/Station";
+import Station from "backend/dal/entities/Station";
 import {PaginationResult} from "backend/bll/services/Results";
-import {StationDTO} from "backend/bll/validation/schemas/stationSchemas";
+import {GetStationsDTO, StationDTO} from "backend/bll/validation/schemas/stationSchemas";
 
 
 
 export default interface StationService {
-    getStations(filter: {city?: string, status?: Status, page?: number, limit?: number}): Promise<PaginationResult<Station[]>>;
+    getStations(filter: GetStationsDTO): Promise<PaginationResult<Station[]>>;
 
     getStation(station_id: string): Promise<Station | null>
 
