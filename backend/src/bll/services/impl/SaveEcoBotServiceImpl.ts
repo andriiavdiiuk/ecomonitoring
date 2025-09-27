@@ -112,15 +112,13 @@ export default class SaveEcoBotServiceImpl implements SaveEcoBotService {
                                 import_time: new Date()
                             }
                         };
-                        await this.measurementRepository.update(measurement.station_id, measurement);
+                        await this.measurementRepository.create(measurement);
                         results.measurements_created++;
                     }
                 }
 
                 if (station) {
-                    station.metadata.last_measurement = new Date();
-                    station.metadata.updated_at = new Date();
-                    await this.stationRepository.update(station.station_id, station);
+                    await this.stationRepository.updateLastMeasurement(station.station_id);
                 }
             } catch (error: unknown) {
                 if (error instanceof Error) {

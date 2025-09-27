@@ -13,7 +13,7 @@ export enum MeasuredParameters {
 
 export enum Unit {
     UgPerM3 = 'ug/m3',
-    Celsius = 'Celsius',
+    Celcius = 'Celcius',
     Percent = '%',
     Hpa = 'hPa',
     Aqi = 'aqi',
