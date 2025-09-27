@@ -1,6 +1,6 @@
 
 export type PaginationResult<T> = {
-    stations: T,
+    data: T,
     pagination: {
         page: number,
         limit: number
