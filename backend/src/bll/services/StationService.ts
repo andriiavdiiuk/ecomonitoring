@@ -1,5 +1,5 @@
 import Station from "backend/dal/entities/Station";
-import {PaginationResult} from "backend/bll/services/Results";
+import {PaginationResult} from "backend/dal/repositories/Results";
 import {GetStationsDTO, StationDTO} from "backend/bll/validation/schemas/stationSchemas";
 
 

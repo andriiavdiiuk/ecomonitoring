@@ -1,7 +1,7 @@
 import StationService from "backend/bll/services/StationService";
 import Station from "backend/dal/entities/Station";
 import StationRepository from "backend/dal/repositories/StationRepository";
-import {PaginationResult} from "backend/bll/services/Results";
+import {PaginationResult} from "backend/dal/repositories/Results";
 import {GetStationsDTO, StationDTO} from "backend/bll/validation/schemas/stationSchemas";
 
 export class StationServiceImpl implements StationService {
@@ -22,20 +22,7 @@ export class StationServiceImpl implements StationService {
         if (filter.status) query.status = filter.status;
 
 
-        const [stations, total] = await Promise.all([
-            this.stationRepository.getStations(query, {page: page, limit: limit}),
-            this.stationRepository.count(query)
-        ]);
-
-        return {
-            stations,
-            pagination: {
-                page,
-                limit,
-                total,
-                pages: Math.ceil(total / limit),
-            },
-        };
+        return await this.stationRepository.getStationsPaginated(query, {page: page, limit: limit});
     }
 
     async getStation(station_id: string): Promise<Station | null> {
