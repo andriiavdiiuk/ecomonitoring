@@ -1,4 +1,4 @@
-import {LoginUserDto, RegisterUserDto} from "backend/api/validation/schemas/userSchemas";
+import {LoginUserDto, RegisterUserDto} from "backend/bll/validation/schemas/userSchemas";
 
 export default interface UserService {
     createUser(userDto: RegisterUserDto): Promise<string>

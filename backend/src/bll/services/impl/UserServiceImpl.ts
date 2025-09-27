@@ -1,7 +1,7 @@
 import {User} from 'backend/dal/entities/User';
 import {encryptPassword, verifyPassword} from "backend/api/security/passwordUtils";
 import {getJwt} from "backend/api/security/jwtUtils";
-import {LoginUserDto, RegisterUserDto} from "backend/api/validation/schemas/userSchemas";
+import {LoginUserDto, RegisterUserDto} from "backend/bll/validation/schemas/userSchemas";
 import ValidationError from "backend/bll/errors/validationError";
 import UserRepository from "backend/dal/repositories/UserRepository";
 import UserService from "backend/bll/services/UserService";

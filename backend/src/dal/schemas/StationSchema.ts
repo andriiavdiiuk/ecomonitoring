@@ -88,7 +88,7 @@ const StationSchema = new mongoose.Schema<StationDocument>({
 });
 
 
-StationSchema.index({ location: '2dsphere' });
+StationSchema.index({ geolocation: '2dsphere' });
 StationSchema.index({ city_name: 1, status: 1 });
 StationSchema.index({ 'metadata.last_measurement': -1 });
 

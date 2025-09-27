@@ -1,5 +1,5 @@
 import {Request, Response} from "express";
-import {LoginUserDto, RegisterUserDto} from "backend/api/validation/schemas/userSchemas";
+import {LoginUserDto, RegisterUserDto} from "backend/bll/validation/schemas/userSchemas";
 import UserService from "backend/bll/services/UserService";
 
 class UserController {

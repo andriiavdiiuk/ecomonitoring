@@ -1,5 +1,5 @@
 import StationRepository from "backend/dal/repositories/StationRepository";
-import Station from "backend/dal/entities/Station";
+import Station, {Status} from "backend/dal/entities/Station";
 import {MongoCrudRepository} from "backend/dal/repositories/MongoCrudRepository";
 import StationModel, {StationDocument} from "backend/dal/schemas/StationSchema";
 
@@ -22,7 +22,7 @@ export default class StationRepositoryImpl extends MongoCrudRepository<StationDo
 
     public async findNearby(longitude: number, latitude: number, maxDistance: number): Promise<Station[]> {
         return await this.model.find({
-            location: {
+            geolocation: {
                 $near: {
                     $geometry: {
                         type: 'Point',
@@ -31,7 +31,27 @@ export default class StationRepositoryImpl extends MongoCrudRepository<StationDo
                     $maxDistance: maxDistance
                 }
             },
-            status: 'active'
+            status: Status.Active
         }).exec();
+    }
+
+    async getStations(
+        filter: { city?: string; status?: Status } = {},
+        options: { page?: number; limit?: number; sort?: Record<string, 1 | -1> } = {}
+    ): Promise<Station[]> {
+        const page = options.page ?? 1;
+        const limit = options.limit ?? 50;
+        const sort = options.sort ?? { city_name: 1, station_name: 1 };
+
+        const query: Partial<Station> = {};
+        if (filter.city) query.city_name = filter.city
+        if (filter.status) query.status = filter.status;
+
+        return await this.model
+            .find(query)
+            .sort(sort)
+            .limit(limit)
+            .skip((page - 1) * limit)
+            .exec();
     }
 }

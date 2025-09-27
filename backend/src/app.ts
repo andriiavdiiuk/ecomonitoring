@@ -10,6 +10,7 @@ import {
 import {notFoundHandler} from "backend/api/middleware/notFoundHandler";
 import userRoutes from "backend/api/routes/UserRoutes";
 import saveEcoBotRoutes from "backend/api/routes/SaveEcoBotRoutes";
+import stationsRoutes from "backend/api/routes/StationRoutes";
 
 
 const app = express();
@@ -30,6 +31,7 @@ app.use((req, res, next) => {
 });
 app.use(userRoutes);
 app.use(saveEcoBotRoutes);
+app.use(stationsRoutes);
 app.use(errorLogger);
 app.use(errorHandler);
 
