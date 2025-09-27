@@ -102,7 +102,7 @@ export default class SaveEcoBotServiceImpl implements SaveEcoBotService {
                     });
 
                     if (!existingMeasurement && (measurementGroup.pollutants as Pollutant[]).length > 0) {
-                        const measurement: Measurement = {
+                        const measurement: Partial<Measurement> = {
                             station_id: <string>stationInfo.station_id,
                             measurement_time: measurementGroup.measurement_time as Date,
                             pollutants: measurementGroup.pollutants as Pollutant[],

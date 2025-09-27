@@ -2,6 +2,7 @@ import {Status} from "backend/dal/entities/Station";
 import {Pollutant} from "backend/dal/entities/Pollutant";
 
 export interface Measurement {
+    id: string,
     station_id: string;
     status?: Status;
     measurement_time: Date;

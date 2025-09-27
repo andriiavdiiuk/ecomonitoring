@@ -17,11 +17,11 @@ export abstract class MongoCrudRepository<T, K = string> implements Repository<T
     }
 
     async find(id: K): Promise<T | null> {
-        return await this.model.findOne({id}).exec();
+        return await this.model.findOne({_id: id}).exec();
     }
 
     async exists(id: K): Promise<boolean> {
-        const result = await this.model.exists({id}).exec();
+        const result = await this.model.exists({_id: id}).exec();
         return !!result;
     }
 
@@ -30,7 +30,7 @@ export abstract class MongoCrudRepository<T, K = string> implements Repository<T
     }
 
     async delete(id: K): Promise<boolean> {
-        const res = await this.model.deleteOne({id}).exec();
+        const res = await this.model.deleteOne({_id: id}).exec();
         return res.deletedCount === 1;
     }
 

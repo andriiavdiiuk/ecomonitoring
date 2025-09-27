@@ -1,43 +1,16 @@
 import {Measurement} from "backend/dal/entities/Measurement";
-import MeasurementRepository, {MeasurementStats, Severity, ThresholdExceedance} from "backend/dal/repositories/MeasurementRepository";
-import {MeasuredParameters} from "backend/dal/entities/Pollutant";
+import MeasurementRepository, {
+    MeasurementStats,
+} from "backend/dal/repositories/MeasurementRepository";
+import {MeasuredParameters, Pollutant} from "backend/dal/entities/Pollutant";
 import {MongoCrudRepository} from "backend/dal/repositories/MongoCrudRepository";
 import MeasurementModel, {MeasurementDocument} from "backend/dal/schemas/MeasurementSchema";
+import mongoose from "mongoose";
+import {PaginationResult} from "backend/dal/repositories/Results";
 
 export class MeasurementRepositoryImpl extends MongoCrudRepository<MeasurementDocument> implements MeasurementRepository {
     constructor() {
         super(MeasurementModel);
-    }
-    public checkThresholds(measurement: Measurement): ThresholdExceedance[] {
-        const thresholds: Partial<Record<MeasuredParameters, { warning: number; alert: number; emergency: number }>> = {
-            [MeasuredParameters.PM25]: {warning: 25, alert: 35, emergency: 75},
-            [MeasuredParameters.PM10]: {warning: 50, alert: 75, emergency: 150},
-            [MeasuredParameters.AirQualityIndex]: {warning: 50, alert: 100, emergency: 150},
-        };
-
-        const exceedances: ThresholdExceedance[] = [];
-
-        measurement.pollutants.forEach(p => {
-            const threshold = thresholds[p.pollutant];
-            if (!threshold) return;
-
-            let severity: Severity = Severity.Normal;
-            if (p.value > threshold.emergency) severity = Severity.Emergency;
-            else if (p.value > threshold.alert) severity = Severity.Alert;
-            else if (p.value > threshold.warning) severity = Severity.Warning;
-
-            if (severity !== Severity.Normal) {
-                exceedances.push({
-                    pollutant: p.pollutant,
-                    value: p.value,
-                    threshold: threshold[severity],
-                    severity,
-                    ratio: (p.value / threshold[severity]).toFixed(2),
-                });
-            }
-        });
-
-        return exceedances;
     }
 
     public async getLatestByStation(stationId: string): Promise<Measurement | null> {
@@ -52,14 +25,14 @@ export class MeasurementRepositoryImpl extends MongoCrudRepository<MeasurementDo
         endDate: Date,
         pollutant: MeasuredParameters
     ): Promise<MeasurementStats[]> {
-        const matchStage = {
-            station_id: stationId,
-            measurement_time: {$gte: startDate, $lte: endDate},
-            'pollutants.pollutant': pollutant,
-        };
-
         return await this.model.aggregate([
-            {$match: matchStage},
+            {
+                $match: {
+                    station_id: stationId,
+                    measurement_time: {$gte: startDate, $lte: endDate},
+                    'pollutants.pollutant': pollutant
+                }
+            },
             {$unwind: '$pollutants'},
             {$match: {'pollutants.pollutant': pollutant}},
             {
@@ -69,9 +42,67 @@ export class MeasurementRepositoryImpl extends MongoCrudRepository<MeasurementDo
                     avg: {$avg: '$pollutants.value'},
                     min: {$min: '$pollutants.value'},
                     max: {$max: '$pollutants.value'},
-                    latest: {$last: '$measurement_time'},
-                },
-            },
+                    latest: {$last: '$measurement_time'}
+                }
+            }
         ]).exec() as MeasurementStats[];
     }
+
+    public async getMeasurementsPaginated(
+        filter: {
+            station_id?: string,
+            start_date?: Date,
+            end_date?: Date,
+            pollutant?: MeasuredParameters
+        },
+        options: { page?: number; limit?: number; sort?: Record<string, 1 | -1> }
+    ): Promise<PaginationResult<Measurement[]>> {
+        const page = options.page ?? 1;
+        const limit = options.limit ?? 50;
+
+        const query: mongoose.FilterQuery<Measurement> = {};
+
+        if (filter.station_id) query.station_id = filter.station_id;
+        if (filter.pollutant) query["pollutants.pollutant"] = filter.pollutant;
+        if (filter.start_date || filter.end_date) {
+            query.measurement_time = {};
+            if (filter.start_date) query.measurement_time.$gte = filter.start_date;
+            if (filter.end_date) query.measurement_time.$lte = filter.end_date;
+        }
+        const [data, total] = await Promise.all([
+            this.model.find(query)
+                .skip((page - 1) * limit)
+                .limit(limit)
+                .exec(),
+            this.count(query)
+        ]);
+
+        return {
+            data: data,
+            pagination: {
+                page,
+                limit,
+                total,
+                pages: Math.ceil(total / limit),
+            }
+        }
+    }
+
+    public async getLatest(): Promise<Measurement[]> {
+        return await this.model.aggregate([
+            {
+                $sort: {measurement_time: -1}
+            },
+            {
+                $group: {
+                    _id: '$station_id',
+                    latest_measurement: {$first: '$$ROOT'}
+                }
+            },
+            {
+                $replaceRoot: {newRoot: '$latest_measurement'}
+            }
+        ]).exec() as Measurement[];
+    }
+
 }
