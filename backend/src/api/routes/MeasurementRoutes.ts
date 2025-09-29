@@ -32,6 +32,20 @@ stationsRoutes.get("/api/measurements",
     }
 );
 
+stationsRoutes.get("/api/measurement/latest",
+    async (req: Request, res: Response): Promise<Response> => {
+        return await measurementController.getLatest(req, res);
+    }
+);
+
+stationsRoutes.get("/api/measurement/statistics",
+    validationMiddleware(MeasurementFilterSchema, RequestSource.Query),
+    async (req: Request, res: Response): Promise<Response> => {
+        const dto = MeasurementFilterSchema.parse(req.query);
+        return await measurementController.getStatistics(req, res, dto);
+    }
+);
+
 stationsRoutes.get("/api/measurement/:id",
     validationMiddleware(MeasurementIdParamsSchema, RequestSource.Params),
     async (req: Request, res: Response): Promise<Response> => {
@@ -70,19 +84,7 @@ stationsRoutes.delete("/api/measurement/:id",
     }
 );
 
-stationsRoutes.get("/api/measurement/latest",
-    async (req: Request, res: Response): Promise<Response> => {
-        return await measurementController.getLatest(req, res);
-    }
-);
 
-stationsRoutes.get("/api/measurement/statistics",
-    validationMiddleware(MeasurementFilterSchema, RequestSource.Query),
-    async (req: Request, res: Response): Promise<Response> => {
-        const dto = MeasurementFilterSchema.parse(req.query);
-        return await measurementController.getStatistics(req, res, dto);
-    }
-);
 
 
 export default stationsRoutes;

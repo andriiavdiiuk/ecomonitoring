@@ -73,7 +73,7 @@ export default class SaveEcoBotServiceImpl implements SaveEcoBotService {
                     await this.stationRepository.create(stationInfo);
                     results.stations_created++;
                 } else {
-                    await this.stationRepository.update(<string>stationInfo.station_id, stationInfo);
+                    await this.stationRepository.updateBy({station_id: <string>stationInfo.station_id}, stationInfo);
                     results.stations_updated++;
                 }
 

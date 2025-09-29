@@ -27,8 +27,7 @@ export const MeasurementSchema = z.object({
 });
 
 export const UpdateMeasurementSchema = MeasurementSchema
-    .omit({id: true})
-    .partial();
+    .omit({id: true});
 
 
 export const GetMeasurementsSchema = z.object({

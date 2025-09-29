@@ -30,8 +30,7 @@ export const StationSchema = z.object({
     metadata: MetadataSchema
 });
 export const UpdateStationSchema = StationSchema
-    .omit({ station_id: true })
-    .partial();
+    .omit({ station_id: true });
 
 
 export const GetStationsQuerySchema = z.object({

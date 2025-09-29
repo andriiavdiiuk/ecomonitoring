@@ -13,7 +13,7 @@ export abstract class MongoCrudRepository<T, K = string> implements Repository<T
     }
 
     async update(id: K, item: Partial<T>): Promise<T | null> {
-        return await this.model.findOneAndUpdate({id}, item, {new: true}).exec();
+        return await this.model.findOneAndUpdate({_id:id}, item, {new: true}).exec();
     }
 
     async find(id: K): Promise<T | null> {
