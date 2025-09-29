@@ -9,19 +9,17 @@ class UserController {
         this.userService = userService;
     }
 
-    async register(req: Request, res: Response): Promise<Response> {
-        const data: RegisterUserDto = req.body as RegisterUserDto;
-        const token = await this.userService.createUser(data);
+    async register(req: Request, res: Response, registerUserDto: RegisterUserDto): Promise<Response> {
+        const token = await this.userService.createUser(registerUserDto);
 
         return res.status(201).json({
             token,
         });
     }
 
-    async login(req: Request, res: Response) : Promise<Response>
+    async login(req: Request, res: Response, loginUserDto: LoginUserDto) : Promise<Response>
     {
-        const data: LoginUserDto = req.body as LoginUserDto;
-        const token = await this.userService.loginUser(data);
+        const token = await this.userService.loginUser(loginUserDto);
 
         return res.status(201).json({
             token: token

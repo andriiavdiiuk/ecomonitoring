@@ -1,4 +1,4 @@
-import express from "express";
+import express, {Request, Response} from "express";
 
 import StationRepositoryImpl from "backend/dal/repositories/impl/StationRepositoryImpl";
 import {authMiddleware} from "backend/api/middleware/authMiddleware";
@@ -7,8 +7,9 @@ import StationController from "backend/api/controllers/StationController";
 import {StationServiceImpl} from "backend/bll/services/impl/StationServiceImpl";
 import {RequestSource, validationMiddleware} from "backend/api/middleware/validationMiddleware";
 import {
-    GetStationsQuerySchema,
-    NearbyStationsParamsSchema,
+    GetStationsDTO,
+    GetStationsQuerySchema, NearbyStationsDTO,
+    NearbyStationsParamsSchema, StationDTO,
     StationIdParamsSchema,
     StationSchema,
     UpdateStationSchema
@@ -19,31 +20,53 @@ const stationRepository = new StationRepositoryImpl()
 const stationService = new StationServiceImpl(stationRepository);
 const stationController = new StationController(stationService);
 
+
 stationsRoutes.get("/api/stations",
     validationMiddleware(GetStationsQuerySchema, RequestSource.Query),
-    stationController.getStations.bind(stationController));
+    async (req: Request, res: Response): Promise<Response> => {
+        const dto: GetStationsDTO = GetStationsQuerySchema.parse(req.query);
+        return await stationController.getStations(req, res, dto);
+    });
 
 stationsRoutes.get("/api/station/:id",
     validationMiddleware(StationIdParamsSchema, RequestSource.Params),
-    stationController.getStationById.bind(stationController));
+    async (req: Request, res: Response): Promise<Response> => {
+        const { id } = StationIdParamsSchema.parse(req.params);
+        return await stationController.getStationById(req, res, id);
+    });
 
 stationsRoutes.post("/api/station",
     authMiddleware([Roles.Admin]),
     validationMiddleware(StationSchema),
-    stationController.createStation.bind(stationController));
+    async (req: Request, res: Response): Promise<Response> => {
+        const dto: StationDTO = StationSchema.parse(req.body);
+        return await stationController.createStation(req, res, dto);
+    });
 
 stationsRoutes.put("/api/station/:id",
     authMiddleware([Roles.Admin]),
     validationMiddleware(StationIdParamsSchema, RequestSource.Params),
     validationMiddleware(UpdateStationSchema),
-    stationController.updateStation.bind(stationController));
+    async (req: Request, res: Response): Promise<Response> => {
+        const { id } = StationIdParamsSchema.parse(req.params);
+        const dto: StationDTO = UpdateStationSchema.parse(req.body) as StationDTO;
+        dto.station_id = id;
+        return await stationController.updateStation(req, res, dto);
+    });
 
 stationsRoutes.delete("/api/station/:id",
     authMiddleware([Roles.Admin]),
     validationMiddleware(StationIdParamsSchema, RequestSource.Params),
-    stationController.deleteStation.bind(stationController));
+    async (req: Request, res: Response): Promise<Response> => {
+        const { id } = StationIdParamsSchema.parse(req.params);
+        return await stationController.deleteStation(req, res, id);
+    });
 
 stationsRoutes.get("/api/station/nearby/:longitude/:latitude/:maxDistance",
     validationMiddleware(NearbyStationsParamsSchema, RequestSource.Params),
-    stationController.findNearbyStations.bind(stationController));
+    async (req: Request, res: Response): Promise<Response> => {
+        const params: NearbyStationsDTO = NearbyStationsParamsSchema.parse(req.params);
+        return await stationController.findNearbyStations(req, res, params);
+    });
+
 export default stationsRoutes;

@@ -1,4 +1,4 @@
-import express from "express";
+import express, {Request, Response} from "express";
 
 import {authMiddleware} from "backend/api/middleware/authMiddleware";
 import {Roles} from "backend/dal/entities/Roles";
@@ -14,46 +14,75 @@ import MeasurementController from "backend/api/controllers/MeasurementController
 import {MeasurementServiceImpl} from "backend/bll/services/impl/MeasurementServiceImpl";
 import {MeasurementRepositoryImpl} from "backend/dal/repositories/impl/MeasurementRepositoryImpl";
 import {
-    GetMeasurementsSchema, MeasurementFilterSchema,
+    GetMeasurementsSchema, MeasurementDTO, MeasurementFilterSchema,
     MeasurementIdParamsSchema,
     MeasurementSchema, UpdateMeasurementSchema
 } from "backend/bll/validation/schemas/measurementSchemas";
+import {Measurement} from "backend/dal/entities/Measurement";
 
 const stationsRoutes = express.Router();
 const measurementRepository = new MeasurementRepositoryImpl()
 const measurementService = new MeasurementServiceImpl(measurementRepository);
 const measurementController = new MeasurementController(measurementService);
-
 stationsRoutes.get("/api/measurements",
     validationMiddleware(GetMeasurementsSchema, RequestSource.Query),
-    measurementController.getMeasurements.bind(measurementController));
-
-
-stationsRoutes.get("/api/measurement/latest",
-    measurementController.getLatest.bind(measurementController));
-
-stationsRoutes.get("/api/measurement/statistics",
-    validationMiddleware(MeasurementFilterSchema, RequestSource.Query),
-    measurementController.getStatistics.bind(measurementController));
+    async (req: Request, res: Response): Promise<Response> => {
+        const dto = GetMeasurementsSchema.parse(req.query);
+        return await measurementController.getMeasurements(req, res, dto);
+    }
+);
 
 stationsRoutes.get("/api/measurement/:id",
     validationMiddleware(MeasurementIdParamsSchema, RequestSource.Params),
-    measurementController.getMeasurementById.bind(measurementController));
+    async (req: Request, res: Response): Promise<Response> => {
+        const {id} = MeasurementIdParamsSchema.parse(req.params);
+        return await measurementController.getMeasurementById(req, res, id);
+    }
+);
 
 stationsRoutes.post("/api/measurement",
     authMiddleware([Roles.Admin]),
     validationMiddleware(MeasurementSchema),
-    measurementController.createMeasurement.bind(measurementController));
+    async (req: Request, res: Response): Promise<Response> => {
+        const dto: Measurement = MeasurementSchema.parse(req.body) as Measurement;
+        return await measurementController.createMeasurement(req, res, dto);
+    }
+);
 
 stationsRoutes.put("/api/measurement/:id",
     authMiddleware([Roles.Admin]),
     validationMiddleware(MeasurementIdParamsSchema, RequestSource.Params),
     validationMiddleware(UpdateMeasurementSchema),
-    measurementController.updateMeasurement.bind(measurementController));
+    async (req: Request, res: Response): Promise<Response> => {
+        const {id} = MeasurementIdParamsSchema.parse(req.params);
+        const dto: Measurement = UpdateMeasurementSchema.parse(req.body) as Measurement;
+        dto.id = id;
+        return await measurementController.updateMeasurement(req, res, dto);
+    }
+);
 
 stationsRoutes.delete("/api/measurement/:id",
     authMiddleware([Roles.Admin]),
     validationMiddleware(MeasurementIdParamsSchema, RequestSource.Params),
-    measurementController.deleteMeasurement.bind(measurementController));
+    async (req: Request, res: Response): Promise<Response> => {
+        const {id} = MeasurementIdParamsSchema.parse(req.params);
+        return await measurementController.deleteMeasurement(req, res, id);
+    }
+);
+
+stationsRoutes.get("/api/measurement/latest",
+    async (req: Request, res: Response): Promise<Response> => {
+        return await measurementController.getLatest(req, res);
+    }
+);
+
+stationsRoutes.get("/api/measurement/statistics",
+    validationMiddleware(MeasurementFilterSchema, RequestSource.Query),
+    async (req: Request, res: Response): Promise<Response> => {
+        const dto = MeasurementFilterSchema.parse(req.query);
+        return await measurementController.getStatistics(req, res, dto);
+    }
+);
+
 
 export default stationsRoutes;
