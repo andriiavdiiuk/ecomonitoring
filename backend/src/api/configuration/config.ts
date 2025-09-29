@@ -28,7 +28,7 @@ const config: Config = {
     dbConnectionString: requireEnv("DB_CONNECTION_STRING"),
     jwt: {
         secret: requireEnv("JWT_SECRET"),
-        expires: 7*24*60,
+        expires: 7*24*60*60,
     },
     cors: {
         origins: requireEnv("ALLOWED_ORIGINS").split(",").map(origin => origin.trim()),
