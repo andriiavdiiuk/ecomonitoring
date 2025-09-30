@@ -21,7 +21,7 @@ class UserController {
     {
         const token = await this.userService.loginUser(loginUserDto);
 
-        return res.status(201).json({
+        return res.status(200).json({
             token: token
         });
     }

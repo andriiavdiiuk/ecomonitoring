@@ -27,7 +27,7 @@ export const StationSchema = z.object({
     platform_name: z.string().min(1, "Platform name is required"),
     status: z.enum(Status),
     measured_parameters: z.array(z.enum(MeasuredParameters)),
-    metadata: MetadataSchema
+    metadata: MetadataSchema.optional(),
 });
 export const UpdateStationSchema = StationSchema
     .omit({ station_id: true });

@@ -4,7 +4,7 @@
   "description": "",
   "main": "backend/app.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --config jest.config.ts --passWithNoTests --detectOpenHandles",
     "dev": "tsx backend/src/app.ts",
     "build": "tsc -p tsconfig.json && tsc-alias",
     "run": "node dist/backend/src/app.js",
@@ -30,7 +30,14 @@
   "type": "module",
   "devDependencies": {
     "@eslint/js": "^9.35.0",
+    "@types/jest": "^30.0.0",
+    "@types/supertest": "^6.0.3",
+    "esbuild-register": "^3.6.0",
     "eslint": "^9.35.0",
+    "jest": "^30.2.0",
+    "mongodb-memory-server": "^10.2.1",
+    "supertest": "^7.1.4",
+    "ts-jest": "^29.4.4",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.44.0"

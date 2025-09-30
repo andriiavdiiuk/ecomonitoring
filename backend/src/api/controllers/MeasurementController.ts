@@ -22,7 +22,7 @@ export default class MeasurementController {
     async getMeasurements(req: Request, res: Response, getMeasurementDto:GetMeasurementDTO): Promise<Response> {
         const measurements = await this.measurementService.getMeasurements(getMeasurementDto);
 
-        return res.json(measurements);
+        return res.status(200).json({measurement:measurements.data, pagination:measurements.pagination});
     }
 
     async getMeasurementById(req: Request, res: Response, id: string): Promise<Response> {
@@ -50,7 +50,7 @@ export default class MeasurementController {
         }
 
         const thresholds = this.measurementService.checkThresholds(measurementData);
-        return res.status(201).json({measurement:measurement, thresholds:thresholds});
+        return res.status(200).json({measurement:measurement, thresholds:thresholds});
 
     }
 
@@ -61,7 +61,7 @@ export default class MeasurementController {
             sendProblemDetail(req, res, 404, "Measurement not found")
         }
 
-        return res.status(200).json();
+        return res.status(204).json();
     }
 
     async getLatest(req: Request, res: Response): Promise<Response> {

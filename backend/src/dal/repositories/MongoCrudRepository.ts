@@ -1,4 +1,4 @@
-import {Model} from 'mongoose';
+import mongoose, {Model} from 'mongoose';
 import Repository from "backend/dal/repositories/Repository";
 
 export abstract class MongoCrudRepository<T, K = string> implements Repository<T, K> {
@@ -13,10 +13,17 @@ export abstract class MongoCrudRepository<T, K = string> implements Repository<T
     }
 
     async update(id: K, item: Partial<T>): Promise<T | null> {
-        return await this.model.findOneAndUpdate({_id:id}, item, {new: true}).exec();
+        return await this.model.findOneAndUpdate({_id: id}, item, {
+            new: true,
+            returnOriginal: false,
+            returnDocument: "after"
+        }).exec();
     }
 
     async find(id: K): Promise<T | null> {
+        if (!mongoose.Types.ObjectId.isValid(id as string | number | mongoose.mongo.BSON.ObjectId | mongoose.mongo.BSON.ObjectIdLike | Uint8Array)) {
+            return null;
+        }
         return await this.model.findOne({_id: id}).exec();
     }
 
@@ -47,7 +54,11 @@ export abstract class MongoCrudRepository<T, K = string> implements Repository<T
     }
 
     async updateBy(query: Partial<{ [P in keyof T]: T[P] }>, item: Partial<T>): Promise<T | null> {
-        return await this.model.findOneAndUpdate(query, item).exec();
+        return await this.model.findOneAndUpdate(query, item, {
+            new: true,
+            returnOriginal: false,
+            returnDocument: "after"
+        }).exec();
     }
 
     async deleteBy(query: Partial<{ [P in keyof T]: T[P] }>): Promise<boolean> {

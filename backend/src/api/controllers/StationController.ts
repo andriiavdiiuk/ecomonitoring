@@ -16,7 +16,7 @@ export default class StationController {
 
     async getStations(req: Request, res: Response,getStationsDto: GetStationsDTO): Promise<Response> {
         const stations = await this.stationService.getStations(getStationsDto);
-        return res.json(stations);
+        return res.status(200).json({stations: stations.data, pagination: stations.pagination});
     }
 
     async getStationById(req: Request, res: Response, id: string): Promise<Response> {
@@ -26,7 +26,7 @@ export default class StationController {
             sendProblemDetail(req, res, 404, "Station not found")
         }
 
-        return res.json(station);
+        return res.status(200).json(station);
     }
 
     async createStation(req: Request, res: Response, stationDto: StationDTO): Promise<Response> {
@@ -52,7 +52,7 @@ export default class StationController {
             sendProblemDetail(req, res, 404, "Station not found")
         }
 
-        return res.status(200).json();
+        return res.status(204).json();
     }
 
     async findNearbyStations(req: Request, res: Response, nearbyStationsDto: NearbyStationsDTO): Promise<Response>

@@ -15,6 +15,7 @@
     "paths": {
       "*": ["./node_modules/*"],
       "backend/*": ["backend/src/*"],
+      "backend_test/*":["backend/test/*"]
     }
   },
   "include": ["./backend/**/*.ts"],

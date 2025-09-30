@@ -1,4 +1,4 @@
-import express, {Request, Response} from "express";
+import express, {Request, Response, Router} from "express";
 import UserController from "backend/api/controllers/UserController";
 import UserServiceImpl from "backend/bll/services/impl/UserServiceImpl";
 import {validationMiddleware} from "backend/api/middleware/validationMiddleware";
@@ -9,29 +9,36 @@ import {
     registerUserSchema
 } from "backend/bll/validation/schemas/userSchemas";
 import UserRepositoryImpl from "backend/dal/repositories/impl/UserRepositoryImpl";
+import PasswordUtils from "backend/api/security/PasswordUtils";
+import Config from "backend/api/configuration/config"
+import JwtUtils from "backend/api/security/JwtUtils";
 
-const userRoutes = express.Router();
+export default function createUserRoutes(config: Config): Router {
+    const userRepository = new UserRepositoryImpl();
+    const passwordUtils = new PasswordUtils(config);
+    const jwtUtils = new JwtUtils(config);
+    const userService = new UserServiceImpl(userRepository, passwordUtils,jwtUtils);
+    const userController = new UserController(userService);
 
-const userRepository = new UserRepositoryImpl();
-const userService = new UserServiceImpl(userRepository);
-const userController = new UserController(userService);
+    const router = express.Router();
 
-userRoutes.post(
-    "/api/user/register",
-    validationMiddleware(registerUserSchema),
-    async (req: Request, res: Response): Promise<Response> => {
-        const dto: RegisterUserDto = registerUserSchema.parse(req.body);
-        return await userController.register(req, res, dto);
-    }
-);
+    router.post(
+        "/api/user/register",
+        validationMiddleware(registerUserSchema),
+        async (req: Request, res: Response) => {
+            const dto: RegisterUserDto = registerUserSchema.parse(req.body);
+            return userController.register(req, res, dto);
+        }
+    );
 
-userRoutes.post(
-    "/api/user/login",
-    validationMiddleware(loginUserSchemas),
-    async (req: Request, res: Response): Promise<Response> => {
-        const dto: LoginUserDto = loginUserSchemas.parse(req.body) as LoginUserDto;
-        return await userController.login(req, res, dto);
-    }
-);
+    router.post(
+        "/api/user/login",
+        validationMiddleware(loginUserSchemas),
+        async (req: Request, res: Response) => {
+            const dto: LoginUserDto = loginUserSchemas.parse(req.body) as LoginUserDto;
+            return userController.login(req, res, dto);
+        }
+    );
 
-export default userRoutes;
+    return router;
+}
