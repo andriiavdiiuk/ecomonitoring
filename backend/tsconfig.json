@@ -14,11 +14,11 @@
     "outDir": "./dist",
     "paths": {
       "*": ["./node_modules/*"],
-      "backend/*": ["backend/src/*"],
-      "backend_test/*":["backend/test/*"]
+      "backend/*": ["./src/*"],
+      "backend_test/*":["./test/*"]
     }
   },
-  "include": ["./backend/**/*.ts"],
+  "include": ["./**/*.ts"],
   "exclude": ["node_modules"],
   "tsc-alias": {
     "verbose": false,

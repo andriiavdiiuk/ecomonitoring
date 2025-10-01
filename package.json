@@ -2,44 +2,14 @@
   "name": "eco_monitoring",
   "version": "1.0.0",
   "description": "",
-  "main": "backend/app.ts",
   "scripts": {
-    "test": "jest --config jest.config.ts --passWithNoTests --detectOpenHandles",
-    "dev": "tsx backend/src/app.ts",
-    "build": "tsc -p tsconfig.json && tsc-alias",
-    "run": "node dist/backend/src/app.js",
-    "build_and_run": "npm run build && npm run run"
-  },
-  "private": true,
-  "dependencies": {
-    "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.3",
-    "@types/express-validator": "^3.0.2",
-    "@types/jsonwebtoken": "^9.0.10",
-    "@types/mongoose": "^5.11.97",
-    "argon2": "^0.44.0",
-    "cors": "^2.8.5",
-    "dotenv": "^17.2.2",
-    "express": "^5.1.0",
-    "helmet": "^8.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.18.1",
-    "tsc-alias": "^1.8.16",
-    "zod": "^4.1.11"
-  },
-  "type": "module",
-  "devDependencies": {
-    "@eslint/js": "^9.35.0",
-    "@types/jest": "^30.0.0",
-    "@types/supertest": "^6.0.3",
-    "esbuild-register": "^3.6.0",
-    "eslint": "^9.35.0",
-    "jest": "^30.2.0",
-    "mongodb-memory-server": "^10.2.1",
-    "supertest": "^7.1.4",
-    "ts-jest": "^29.4.4",
-    "tsx": "^4.20.5",
-    "typescript": "^5.9.2",
-    "typescript-eslint": "^8.44.0"
+    "backend:dev": "npm --prefix backend run dev",
+    "backend:build": "npm --prefix backend run build",
+    "backend:run": "npm --prefix backend run run",
+    "frontend:dev": "npm --prefix frontend run dev",
+    "frontend:build": "npm --prefix frontend run build",
+    "dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\"",
+    "build": "npm run backend:build && npm run frontend:build",
+    "run": "concurrently \"npm run backend:run\" \"npm run frontend:dev\""
   }
 }

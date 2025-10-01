@@ -16,10 +16,10 @@ const config: Config.InitialOptions = {
         ],
     },
     moduleNameMapper: {
-        '^backend/(.*)$': '<rootDir>/backend/src/$1',
-        '^backend_test/(.*)$': '<rootDir>/backend/test/$1',
+        '^backend/(.*)$': '<rootDir>/src/$1',
+        '^backend_test/(.*)$': '<rootDir>/test/$1',
     },
-    setupFilesAfterEnv: ["./backend/test/utilities/disableLogging.ts"]
+    setupFilesAfterEnv: ["./test/utilities/disableLogging.ts"]
 };
 
 export default config;
