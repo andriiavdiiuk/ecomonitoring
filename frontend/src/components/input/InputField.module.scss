@@ -1,0 +1,36 @@
+@use 'frontend/variables';
+@use 'frontend/mixins';
+
+.field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+
+  label {
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+  }
+
+  input {
+    @include mixins.input-style;
+  }
+
+  span {
+    color: variables.$error-color;
+    font-size: 0.875rem;
+  }
+}
+
+.checkbox_field {
+  flex-direction: row;
+  align-items: center;
+
+  .label {
+    margin: 0 0.5rem 0 0;
+  }
+}
+
+.success {
+  color: variables.$success-color;
+  text-align: center;
+}

@@ -1,0 +1,36 @@
+@use "variables";
+
+@mixin input-style {
+  padding: 0.5rem;
+  border-radius: variables.$border-radius;
+  border: 1px solid variables.$input-border;
+
+  &:focus {
+    outline: none;
+    border-color: variables.$primary-color;
+    box-shadow: 0 0 4px rgba(0, 123, 255, 0.4);
+  }
+}
+
+@mixin button-style {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border-radius: variables.$border-radius;
+  border: none;
+  background-color: variables.$primary-color;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+
+  &:hover {
+    background-color: darken(variables.$primary-color, 10%);
+  }
+}
+
+@mixin container-center-style {
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+}
