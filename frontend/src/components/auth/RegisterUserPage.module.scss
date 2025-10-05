@@ -1,10 +1,12 @@
 @use 'frontend/variables';
 @use 'frontend/mixins';
 
-.container {
-  @include mixins.container-center-style;
-}
 
+.container {
+  margin-top: 100px;
+  margin-bottom: 100px;
+  @include mixins.grid-center-style ;
+}
 
 .center_container {
   padding: 2rem;
