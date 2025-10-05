@@ -6,10 +6,10 @@ import axios from "axios";
 import {mapValidationErrors, type ValidationErrorResponse} from "frontend/services/ValidationService.ts";
 import { useNavigate } from 'react-router-dom';
 import AppRoutes from "frontend/AppRoutes.tsx";
+import {useUser} from "frontend/components/auth/UserContext.tsx";
 interface FormData {
     username: string,
     password: string,
-    rememberme: boolean;
 }
 
 interface FormErrors {
@@ -23,13 +23,15 @@ export default function LoginUserPage(): JSX.Element {
     const [formData, setFormData] = useState<FormData>({
         username: '',
         password: '',
-        rememberme: false,
     });
 
     const [error, setError] = useState<string | null>(null);
     const [errors, setFormErrors] = useState<FormErrors>();
     const [success, setSuccess] = useState<boolean>(false);
+    const {setLoggedIn} = useUser();
+
     const navigate = useNavigate();
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         const { name, type, value, checked } = e.target;
         if (type === 'checkbox') {
@@ -56,11 +58,12 @@ export default function LoginUserPage(): JSX.Element {
         }
 
         userService
-            .login(formData.username, formData.password, formData.rememberme)
+            .login(formData.username, formData.password)
             .then(async () => {
                 setSuccess(true);
                 setFormErrors(undefined);
                 setError(null);
+                setLoggedIn(true);
                 await navigate(AppRoutes.Home);
             })
             .catch((err: unknown) => {
@@ -99,11 +102,6 @@ export default function LoginUserPage(): JSX.Element {
                                 type="password"
                                 error={errors?.password}
                                 value={formData.password}
-                                onChange={handleChange}/>
-                    <InputField label={"Remember Me?:"}
-                                name="rememberme"
-                                checked={formData.rememberme}
-                                type="checkbox"
                                 onChange={handleChange}/>
 
                     <button className={styles.button} type="submit">Login</button>
