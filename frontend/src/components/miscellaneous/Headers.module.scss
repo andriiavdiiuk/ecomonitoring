@@ -1,0 +1,44 @@
+@use 'frontend/variables';
+
+.header {
+  background-color: variables.$primary-color;
+  color: white;
+  padding: 1rem 0;
+
+  .container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .title {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+
+    .spacer {
+      flex-grow: 1;
+    }
+
+    a {
+      color: white;
+      text-decoration: none;
+      margin-left: 1rem;
+      font-weight: 500;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+
+  }
+}
