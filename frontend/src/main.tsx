@@ -9,7 +9,10 @@ import LoginUserPage from "frontend/components/auth/LoginUserPage.tsx";
 import Header from "frontend/components/miscellaneous/Header.tsx";
 // import Footer from "frontend/components/miscellaneous/Footer.tsx";
 import {UserProvider} from "frontend/components/auth/UserContext.tsx";
-import LogoutUserPage from "frontend/components/auth/LogoutUserPage.ts";
+import LogoutUserPage from "frontend/components/auth/LogoutUserPage.tsx";
+import StationsTablePage from "frontend/components/stations/StationsTablePage.tsx";
+import StationPage from "frontend/components/stations/StationPage.tsx";
+import EditStationPage from "frontend/components/stations/EditStationPage.tsx";
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
@@ -21,6 +24,10 @@ createRoot(document.getElementById('root')!).render(
                     <Route path={AppRoutes.Register} element={<RegisterUserPage/>}/>
                     <Route path={AppRoutes.Login} element={<LoginUserPage/>}/>
                     <Route path={AppRoutes.Logout} element={<LogoutUserPage />} />
+                    <Route path={AppRoutes.Stations} element={<StationsTablePage />} />
+                    <Route path={AppRoutes.Station} element={<StationPage/>} />
+                    <Route path={AppRoutes.NewStation} element={<EditStationPage />} />
+                    <Route path={AppRoutes.EditStation} element={<EditStationPage />} />
                 </Routes>
                 {/*<Footer/>*/}
             </BrowserRouter>

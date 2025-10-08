@@ -6,7 +6,7 @@ interface TextFieldProps extends React.ComponentPropsWithoutRef<'input'> {
 }
 
 
-function InputField({label, error, ...props}: TextFieldProps): JSX.Element {
+function InputField({label, error, style, className, ...props}: TextFieldProps): JSX.Element {
     let fieldClass = '';
     switch (props.type) {
         case 'radio':
@@ -34,8 +34,8 @@ function InputField({label, error, ...props}: TextFieldProps): JSX.Element {
 
     return (
         <>
-            <div className={fieldClass}>
-                <label htmlFor={inputId} >{label}</label>
+            <div className={[fieldClass, className ].join(' ')} style={style}>
+                { label && <label htmlFor={inputId} >{label}</label> }
                 <input id={inputId}  {...props} />
                 {errorElements}
             </div>

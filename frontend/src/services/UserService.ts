@@ -6,15 +6,22 @@ interface TokenResponse {
 }
 
 
-interface JwtPayload {
+export interface JwtPayload {
     exp: number
+    roles: string[]
 }
 
-function decodeJwt(token: string): JwtPayload | null {
+export function decodeJwt(token: string): JwtPayload | null {
     try {
         const payloadBase64 = token.split('.')[1]
         const payloadJson = atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/'))
-        return JSON.parse(payloadJson) as JwtPayload;
+
+        const parsed = JSON.parse(payloadJson) as { exp: number; roles: string};
+
+        return {
+            exp: parsed.exp,
+            roles: parsed.roles.split(',').map(r => r.trim()),
+        };
     } catch {
         return null
     }
@@ -69,7 +76,10 @@ class UserService {
             })
 
         }
+    }
 
+    public getToken():string {
+        return this.cookies.get('jwt') as string;
     }
 
 

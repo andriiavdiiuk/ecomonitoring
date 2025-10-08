@@ -1,0 +1,23 @@
+@use 'frontend/variables';
+.table {
+  margin: 50px;
+}
+
+.search {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  gap: 50px;
+
+  select {
+    padding: 0.6rem 0.8rem;
+    border-radius: 8px;
+    border: 1px solid #CFD8DC;
+    background-color: white;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .input {
+    flex-grow: 1;
+  }
+}

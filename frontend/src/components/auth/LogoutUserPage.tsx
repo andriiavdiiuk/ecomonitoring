@@ -1,5 +1,5 @@
 import {useUser} from "frontend/components/auth/UserContext.tsx";
-import {useNavigate} from "react-router-dom";;
+import {useNavigate} from "react-router-dom";
 import AppRoutes from "frontend/AppRoutes.tsx";
 
 export default function LogoutUserPage(): (null) {

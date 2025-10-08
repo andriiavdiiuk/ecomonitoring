@@ -1,25 +1,10 @@
 @use 'frontend/variables';
 @use 'frontend/mixins';
-
+@use "./input";
 .field {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 1rem;
-
-  label {
-    margin-bottom: 0.5rem;
-    font-weight: bold;
-  }
-
-  input {
-    @include mixins.input-style;
-  }
-
-  span {
-    color: variables.$error-color;
-    font-size: 0.875rem;
-  }
+  @include input.field
 }
+
 
 .checkbox_field {
   flex-direction: row;

@@ -12,6 +12,7 @@ export default function Header(): JSX.Element {
                 <h1 className={styles.title}>EcoMonitoring</h1>
                 <nav className={styles.nav}>
                     <Link to={AppRoutes.Home}>Home</Link>
+                    <Link to={AppRoutes.Stations}>Stations</Link>
                     <div className={styles.spacer}/>
                     {!loggedIn &&
                         <>
