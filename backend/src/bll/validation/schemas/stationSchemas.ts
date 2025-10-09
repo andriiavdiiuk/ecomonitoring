@@ -14,7 +14,7 @@ const MetadataSchema = z.object({
     created_at: z.coerce.date(),
     updated_at: z.coerce.date(),
     data_source: z.string(),
-    last_measurement: z.coerce.date()
+    last_measurement: z.coerce.date().optional(),
 });
 
 export const StationSchema = z.object({

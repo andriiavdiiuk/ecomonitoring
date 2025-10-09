@@ -1,19 +1,30 @@
 import {createContext, useContext, useState, type ReactNode, useEffect} from 'react';
 import userService, {decodeJwt, type JwtPayload} from 'frontend/services/UserService';
 
+class User {
+    public readonly token: string;
+    public readonly jwtPayload: JwtPayload|null
+    constructor(token:string) {
+        this.token = token;
+        this.jwtPayload = decodeJwt(token);
+    }
+
+    public isRole(role:string):boolean {
+        return !!this.jwtPayload?.roles.includes(role);
+    }
+}
+
 interface UserContextType {
     loggedIn: boolean;
     setLoggedIn: (value: boolean) => void;
-    token: string|null,
-    jwtPayload:JwtPayload|null,
+    user: User | null;
 }
 
 const UserContext = createContext<UserContextType>({
     loggedIn: false,
     setLoggedIn: () => {
     },
-    token: null,
-    jwtPayload:null,
+    user: null,
 });
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -23,8 +34,7 @@ export const UserProvider = ({children}: { children: ReactNode }) => {
     const [loggedIn, _setLoggedIn] = useState<boolean>(userService.isLoggedIn());
 
     const setLoggedIn = (value: boolean) => {
-        if (!value)
-        {
+        if (!value) {
             userService.logout();
         }
         _setLoggedIn(value);
@@ -41,10 +51,10 @@ export const UserProvider = ({children}: { children: ReactNode }) => {
         };
     }, []);
 
-    const token = userService.getToken();
-    const jwtPayload = decodeJwt(token);
+    const user = new User(userService.getToken());
+
     return (
-        <UserContext.Provider value={{loggedIn, setLoggedIn,token,jwtPayload}}>
+        <UserContext.Provider value={{loggedIn, setLoggedIn, user}}>
             {children}
         </UserContext.Provider>
     );

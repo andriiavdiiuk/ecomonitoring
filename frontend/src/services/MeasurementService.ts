@@ -56,8 +56,16 @@ export interface MeasurementResponse {
     };
 }
 
+export interface Threshold {
+    pollutant: string;
+    value: number;
+    threshold: number;
+    severity: string;
+    ratio: string;
+}
+
 interface getMeasurements {
-    station_id?:string,
+    station_id?: string,
     start_date?: string,
     end_date?: string,
     pollutant?: string,
@@ -66,33 +74,55 @@ interface getMeasurements {
 }
 
 interface getStatistics {
-    station_id?:string,
+    station_id?: string,
     start_date?: string,
     end_date?: string,
     pollutant?: string,
 }
 
+export interface MeasurementUpdate {
+    measurement: Measurement;
+    threshold: Threshold[]
+}
+
 export interface measurementStatistics {
-    count:number,
+    count: number,
     avg: number,
     min: number,
     max: number
 }
 
 class measurementService {
-    public async getMeasurements(params?: getMeasurements ): Promise<MeasurementResponse> {
+    public async getMeasurements(params?: getMeasurements): Promise<MeasurementResponse> {
         const response = await api.get<MeasurementResponse>("/measurements", {params});
         return response.data;
     }
 
-    public async getStatistics(params?: getStatistics): Promise<measurementStatistics>
-    {
-        const response = await api.get<measurementStatistics>(`/measurement/statistics/`,{params});
+    public async getStatistics(params?: getStatistics): Promise<measurementStatistics> {
+        const response = await api.get<measurementStatistics>(`/measurement/statistics/`, {params});
         return response.data;
     }
 
-    public async getMeasurement(id:string): Promise<Measurement>{
+    public async getMeasurement(id: string): Promise<Measurement> {
         const response = await api.get<Measurement>(`/measurement/${id}`);
+        return response.data;
+    }
+
+    public async createMeasurement(measurement: Partial<Measurement>): Promise<MeasurementUpdate>{
+        const response = await api.post<MeasurementUpdate>(`/measurement`, measurement);
+        return response.data;
+    }
+
+    public async updateMeasurement(measurement: Partial<Measurement>):  Promise<MeasurementUpdate> {
+        if (measurement._id) {
+            const response = await api.put<MeasurementUpdate>(`/measurement/${measurement._id}`, measurement);
+            return response.data;
+        }
+        throw new Error("Undefined measurement id");
+    }
+
+    public async deleteMeasurement(id: string): Promise<boolean> {
+        const response = await api.delete<boolean>(`/measurement/${id}`);
         return response.data;
     }
 }

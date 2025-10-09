@@ -1,0 +1,22 @@
+@use 'frontend/mixins';
+@use 'frontend/variables';
+
+.container {
+  margin: 50px;
+
+  .button_danger,
+  button {
+    @include mixins.button-style;
+  }
+
+
+  .button_danger {
+    background-color: variables.$error-color;
+
+
+    &:hover {
+      background-color: darken(variables.$error-color, 10%);
+    }
+  }
+}
+

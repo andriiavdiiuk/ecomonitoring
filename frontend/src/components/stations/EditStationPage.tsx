@@ -92,7 +92,8 @@ export default function EditStationPage(): JSX.Element {
 
     return (
         <div className={styles.container}>
-            <h2>Create New Station</h2>
+            {!id && <h2>Create New Station</h2>}
+            {id && <h2>Edit Station</h2>}
             {error && <p style={{color: "red"}}>{error}</p>}
             {success && <p style={{color: "green"}}>Station created successfully!</p>}
             <form onSubmit={handleSubmit}>

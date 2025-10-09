@@ -13,6 +13,7 @@ import LogoutUserPage from "frontend/components/auth/LogoutUserPage.tsx";
 import StationsTablePage from "frontend/components/stations/StationsTablePage.tsx";
 import StationPage from "frontend/components/stations/StationPage.tsx";
 import EditStationPage from "frontend/components/stations/EditStationPage.tsx";
+import EditMeasurementPage from "frontend/components/stations/EditMeasurementPage.tsx";
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
@@ -28,6 +29,8 @@ createRoot(document.getElementById('root')!).render(
                     <Route path={AppRoutes.Station} element={<StationPage/>} />
                     <Route path={AppRoutes.NewStation} element={<EditStationPage />} />
                     <Route path={AppRoutes.EditStation} element={<EditStationPage />} />
+                    <Route path={AppRoutes.NewMeasurement} element={<EditMeasurementPage />} />
+                    <Route path={AppRoutes.EditMeasurement} element={<EditMeasurementPage />} />
                 </Routes>
                 {/*<Footer/>*/}
             </BrowserRouter>

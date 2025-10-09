@@ -3,8 +3,8 @@ import styles from './DataTable.module.scss';
 
 interface DataTableProps {
     header: string[];
-    data: string[][];
-    handleRowClick?: (row: string[], index: number, id: string|null) => void;
+    data: (string | JSX.Element)[][];
+    handleRowClick?: (row: (string | JSX.Element)[], index: number, id: string|null) => void;
     rowIds?: string[];
 }
 

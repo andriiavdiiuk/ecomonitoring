@@ -4,6 +4,12 @@ Accept: application/json
 
 ###
 
+GET http://localhost:3000/api/measurements?station_id=SAVEDNIPRO_1397
+Content-Type: application/json
+Accept: application/json
+
+###
+
 GET http://localhost:3000/api/measurement/68d7d743adeec2b57c1c9c48
 Content-Type: application/json
 Accept: application/json
@@ -35,7 +41,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc
 PUT http://localhost:3000/api/measurement/68dcfef5817004f42cfc3a7a
 Content-Type: application/json
 Accept: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QxMmYzNTY3NTF5NCIsInJvbGVzIjoidXNlcixhZG1pbiIsImlhdCI6MTc1OTEzODQ2OCwiZXhwIjoxNzU5NzQzMjY4LCJzdWIiOiI2OGQ1NTA4NmU0ZDJhNDI2MmNiZGYwNGEifQ.XpC_XxTBmu7a92Hb4GQTt79ZUy8h3P-_6AdRudYCbLw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QxMmYzNTY3NTF5NCIsInJvbGVzIjoidXNlcixhZG1pbiIsImlhdCI6MTc1OTg1NTU1NiwiZXhwIjoxNzYwNDYwMzU2LCJzdWIiOiI2OGQ1NTA4NmU0ZDJhNDI2MmNiZGYwNGEifQ.NKs5fWmJjTOG_8-H4xLeqjhPmw2FsS2_twkEF-ZMrTY
 
 {
   "station_id": "STATION_ID23",

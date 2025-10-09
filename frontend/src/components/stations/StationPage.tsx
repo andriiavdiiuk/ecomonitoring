@@ -1,4 +1,4 @@
-import {useParams} from "react-router";
+import {generatePath, useParams} from "react-router";
 import {type JSX, useEffect, useState} from "react";
 import stationService, {type Station} from "frontend/services/StationService.ts";
 import measurementService, {
@@ -24,10 +24,10 @@ export default function StationPage(): JSX.Element {
     const {id} = useParams<{ id: string }>() as { id: string };
     const [station, setStation] = useState<Station | null>(null);
     const [measurements, setMeasurements] = useState<MeasurementResponse>();
-    const [tableData, setTableData] = useState<string[][]>([]);
+    const [tableData, setTableData] = useState<(string | JSX.Element)[][]>([]);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [search, setSearch] = useState<Search>({pollutant: '', start_date: '', end_date: ''});
-    const user = useUser();
+    const userContext = useUser();
     const navigate = useNavigate();
     useEffect(() => {
 
@@ -50,17 +50,28 @@ export default function StationPage(): JSX.Element {
             if (search.start_date.length > 0) params.start_date = search.start_date;
             if (search.end_date.length > 0) params.end_date = search.end_date;
 
-
-            measurementService.getMeasurements({station_id: id, page: currentPage, limit: 20, ...params})
+                measurementService.getMeasurements({station_id: id, page: currentPage, limit: 20, ...params})
                 .then((res) => {
                     setMeasurements(res);
-                    const mapped: string[][] = [];
+                    const mapped: (string | JSX.Element)[][] = [];
                     res.measurement.forEach((m: Measurement) => {
                         m.pollutants.forEach((p) => {
+                            let edit: string | JSX.Element = '';
+                            if (userContext.user?.isRole('admin'))
+                            {
+                                const path = generatePath(AppRoutes.EditMeasurement, {
+                                    station_id: id,
+                                    measurement_id: m._id,
+                                })
+
+                                edit = <Link to={path} >Edit</Link>;
+                            }
+
                             mapped.push([
                                 new Date(m.measurement_time).toLocaleString(),
                                 p.pollutant,
-                                `${String(p.value)} ${p.unit}`
+                                `${String(p.value)} ${p.unit}`,
+                                ...(edit ? [edit] : [])
                             ]);
                         });
                     });
@@ -102,6 +113,11 @@ export default function StationPage(): JSX.Element {
 
     const header = ["Time", "Pollutants", "Value"];
 
+    if (userContext.user?.isRole('admin'))
+    {
+        header.push('Controls');
+    }
+
     const onPageChange = (page: number): void => {
         setCurrentPage(page);
     };
@@ -111,7 +127,7 @@ export default function StationPage(): JSX.Element {
     return (
         <div className={styles.table}>
 
-            {user.jwtPayload?.roles.includes("admin") &&
+            {userContext.user?.isRole("admin") &&
                 <div className={styles.controls}>
                     <Link className={styles.button} to={AppRoutes.EditStation.replace(":id", id)}>Edit Station</Link>
                     <button className={styles.button_danger} onClick={handleDelete}>Delete Station</button>
@@ -147,6 +163,13 @@ export default function StationPage(): JSX.Element {
 
             <section>
                 <h2>Measurements</h2>
+
+                {userContext.user?.isRole("admin") &&
+                    <div className={styles.controls}>
+                        <Link className={styles.button} to={AppRoutes.NewMeasurement.replace(':station_id',id)}>Add Measurement</Link>
+                    </div>
+                }
+
                 <div className={styles.search}>
 
                     <SelectField className={styles.search_field}
@@ -183,8 +206,6 @@ export default function StationPage(): JSX.Element {
                 <DataTable
                     data={tableData}
                     header={header}
-                    handleRowClick={() => {
-                    }}
                 />
                 <Pagination
                     currentPage={measurements?.pagination.page || 0}
