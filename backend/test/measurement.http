@@ -19,7 +19,7 @@ Accept: application/json
 POST http://localhost:3000/api/measurement
 Content-Type: application/json
 Accept: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QxMmYzNTY3NTF5NCIsInJvbGVzIjoidXNlcixhZG1pbiIsImlhdCI6MTc1OTEzODQ2OCwiZXhwIjoxNzU5NzQzMjY4LCJzdWIiOiI2OGQ1NTA4NmU0ZDJhNDI2MmNiZGYwNGEifQ.XpC_XxTBmu7a92Hb4GQTt79ZUy8h3P-_6AdRudYCbLw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QxMmYzNTY3NTF5NCIsInJvbGVzIjoidXNlcixhZG1pbiIsImlhdCI6MTc1OTg1NTU1NiwiZXhwIjoxNzYwNDYwMzU2LCJzdWIiOiI2OGQ1NTA4NmU0ZDJhNDI2MmNiZGYwNGEifQ.NKs5fWmJjTOG_8-H4xLeqjhPmw2FsS2_twkEF-ZMrTY
 
 {
   "station_id": "STATION_ID23",
@@ -27,7 +27,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc
   "measurement_time": "2025-08-22T14:00:00Z",
   "pollutants": [
     {
-      "pollutant": "PM2.5",
+
       "value": 12.5,
       "unit": "ug/m3",
       "averaging_period": "1 hour",

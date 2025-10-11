@@ -1,11 +1,10 @@
-import {MeasuredParameters} from "backend/dal/entities/Pollutant";
+import {MeasuredParameters} from "common/entities/Pollutant";
 
 export enum Status {
     Active = 'active',
     Inactive = 'inactive',
     Maintenance = 'maintenance',
 }
-
 
 export default interface Station{
     station_id: string,

@@ -3,14 +3,14 @@
  
  
 
-import {User} from "backend/dal/entities/User";
+import {User} from "common/entities/User";
 import {createDefaultConfig} from "backend/api/configuration/config";
 import {Express} from "express";
 import {setupTestApp, teardownTestApp} from "backend_test/utilities/setupTestApp";
 import UserRepositoryImpl from "backend/dal/repositories/impl/UserRepositoryImpl";
 import JwtUtils from "backend/api/security/JwtUtils";
 import PasswordUtils from "backend/api/security/PasswordUtils";
-import {Roles} from "backend/dal/entities/Roles";
+import Roles from "common/entities/Roles";
 import request from "supertest";
 
 const sampleMeasurement = {

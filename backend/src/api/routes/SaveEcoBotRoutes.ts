@@ -5,7 +5,7 @@ import {MeasurementRepositoryImpl} from "backend/dal/repositories/impl/Measureme
 import StationRepositoryImpl from "backend/dal/repositories/impl/StationRepositoryImpl";
 import SaveEcoBotController from "backend/api/controllers/SaveEcoBotController";
 import {authMiddleware} from "backend/api/middleware/authMiddleware";
-import {Roles} from "backend/dal/entities/Roles";
+import Roles from "common/entities/Roles";
 import Config from "backend/api/configuration/config"
 import JwtUtils from "backend/api/security/JwtUtils";
 

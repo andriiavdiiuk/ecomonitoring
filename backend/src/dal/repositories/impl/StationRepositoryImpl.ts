@@ -1,8 +1,8 @@
 import StationRepository from "backend/dal/repositories/StationRepository";
-import Station, {Status} from "backend/dal/entities/Station";
+import Station, {Status} from "common/entities/Station";
 import {MongoCrudRepository} from "backend/dal/repositories/MongoCrudRepository";
 import StationModel, {StationDocument} from "backend/dal/schemas/StationSchema";
-import {PaginationResult} from "backend/dal/repositories/Results";
+import {PaginationResult} from "common/Results";
 
 export default class StationRepositoryImpl extends MongoCrudRepository<StationDocument> implements StationRepository {
 

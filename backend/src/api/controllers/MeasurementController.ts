@@ -9,8 +9,9 @@ import {
     MeasurementIdParamsSchema,
     MeasurementSchema,
     UpdateMeasurementSchema,
-} from "backend/bll/validation/schemas/measurementSchemas";
-import {Measurement} from "backend/dal/entities/Measurement";
+} from "common/validation/schemas/measurementSchemas";
+import {Measurement} from "common/entities/Measurement";
+import {MeasurementThreshold, PaginationResult} from "common/Results";
 
 export default class MeasurementController {
     private readonly measurementService: MeasurementService
@@ -19,10 +20,10 @@ export default class MeasurementController {
         this.measurementService = measurementService;
     }
 
-    async getMeasurements(req: Request, res: Response, getMeasurementDto:GetMeasurementDTO): Promise<Response> {
+    async getMeasurements(req: Request, res: Response, getMeasurementDto: GetMeasurementDTO): Promise<Response> {
         const measurements = await this.measurementService.getMeasurements(getMeasurementDto);
 
-        return res.status(200).json({measurement:measurements.data, pagination:measurements.pagination});
+        return res.status(200).json(measurements);
     }
 
     async getMeasurementById(req: Request, res: Response, id: string): Promise<Response> {
@@ -38,20 +39,21 @@ export default class MeasurementController {
     async createMeasurement(req: Request, res: Response, measurementData: Measurement): Promise<Response> {
         const measurement = await this.measurementService.createMeasurement(measurementData);
         const thresholds = this.measurementService.checkThresholds(measurement);
-        return res.status(201).json({measurement:measurement, thresholds:thresholds});
+        const result: MeasurementThreshold = {measurement: measurement, thresholds: thresholds};
+        return res.status(201).json(result);
 
     }
 
-    async updateMeasurement(req: Request, res: Response,measurementData: Measurement): Promise<Response> {
+    async updateMeasurement(req: Request, res: Response, measurementData: Measurement): Promise<Response> {
         const measurement = await this.measurementService.updateMeasurement(measurementData);
 
-        if (!measurement) {
+        if (!measurement ) {
             sendProblemDetail(req, res, 404, "Measurement not found")
         }
 
         const thresholds = this.measurementService.checkThresholds(measurementData);
-        return res.status(200).json({measurement:measurement, thresholds:thresholds});
-
+        const result: MeasurementThreshold = {measurement: measurement!, thresholds: thresholds};
+        return res.status(200).json(result);
     }
 
     async deleteMeasurement(req: Request, res: Response, id: string): Promise<Response> {

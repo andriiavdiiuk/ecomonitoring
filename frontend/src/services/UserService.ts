@@ -1,5 +1,6 @@
 import api from "frontend/services/api.ts";
 import Cookies from 'universal-cookie';
+import type {LoginUserDto, RegisterUserDto} from "common/validation/schemas/userSchemas.ts";
 
 interface TokenResponse {
     token: string
@@ -34,10 +35,8 @@ class UserService {
         this.cookies = new Cookies(null, {path: "/"});
     }
 
-    public async register(username: string, email: string, password: string): Promise<string> {
-        const response = await api.post<TokenResponse>("/user/register", {
-            username, email, password
-        });
+    public async register(params: RegisterUserDto): Promise<string> {
+        const response = await api.post<TokenResponse>("/user/register", params);
 
         const token = response.data.token
         this.set_cookie(token);
@@ -45,10 +44,8 @@ class UserService {
         return token;
     }
 
-    public async login(username: string, password: string): Promise<string> {
-        const response = await api.post<TokenResponse>("/user/login", {
-            username, password
-        });
+    public async login(params: LoginUserDto): Promise<string> {
+        const response = await api.post<TokenResponse>("/user/login", params);
         const token = response.data.token
         this.set_cookie(token);
 

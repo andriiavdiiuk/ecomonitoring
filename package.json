@@ -8,9 +8,23 @@
     "backend:run": "npm --prefix backend run run",
     "frontend:dev": "npm --prefix frontend run dev",
     "frontend:build": "npm --prefix frontend run build",
+    "common:build": "npm --prefix common run build",
     "dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\"",
-    "build": "npm run backend:build && npm run frontend:build",
+    "build": "npm run common:build && npm run backend:build && npm run frontend:build",
     "run": "concurrently \"npm run backend:run\" \"npm run frontend:dev\""
+  },
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "common",
+      "backend",
+      "frontend"
+    ]
+  },
+  "config": {
+    "mongodbMemoryServer": {
+      "disablePostinstall": "1"
+    }
   },
   "dependencies": {
     "concurrently": "^9.2.1"

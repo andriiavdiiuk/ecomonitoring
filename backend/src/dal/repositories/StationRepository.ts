@@ -1,6 +1,6 @@
-import Station, {Status} from "backend/dal/entities/Station";
+import Station, {Status} from "common/entities/Station";
 import Repository from "backend/dal/repositories/Repository";
-import {PaginationResult} from "backend/dal/repositories/Results";
+import {PaginationResult} from "common/Results";
 
 
 export default interface StationRepository extends Repository<Station> {

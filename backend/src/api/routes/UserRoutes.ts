@@ -7,7 +7,7 @@ import {
     loginUserSchemas,
     RegisterUserDto,
     registerUserSchema
-} from "backend/bll/validation/schemas/userSchemas";
+} from "common/validation/schemas/userSchemas";
 import UserRepositoryImpl from "backend/dal/repositories/impl/UserRepositoryImpl";
 import PasswordUtils from "backend/api/security/PasswordUtils";
 import Config from "backend/api/configuration/config"

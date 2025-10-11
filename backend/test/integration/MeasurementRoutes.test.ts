@@ -6,7 +6,7 @@
 import request from "supertest";
 import {Express, NextFunction, Request} from "express";
 import {setupTestApp, teardownTestApp} from "backend_test/utilities/setupTestApp";
-import {Roles} from "backend/dal/entities/Roles";
+import Roles from "common/entities/Roles";
 
 jest.mock("backend/api/middleware/authMiddleware", () => ({
     authMiddleware: (_jwtUtils: never, _roles: Roles[]) => (req: Request, res: Response, next: NextFunction) => {
@@ -81,8 +81,8 @@ describe("Measurement Routes", () => {
     it("GET /api/measurements should return list", async () => {
         const res = await request(app).get("/api/measurements");
         expect(res.status).toBe(200);
-        expect(Array.isArray(res.body.measurement)).toBe(true);
-        (res.body.measurement as []).forEach(m => { expectMeasurementObject(m); });
+        expect(Array.isArray(res.body.data)).toBe(true);
+        (res.body.data as []).forEach(m => { expectMeasurementObject(m); });
         expect(res.body).toHaveProperty("pagination");
         expect(res.body.pagination).toHaveProperty("page");
         expect(res.body.pagination).toHaveProperty("limit");

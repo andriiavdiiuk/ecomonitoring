@@ -1,12 +1,10 @@
-import {Measurement} from "backend/dal/entities/Measurement";
-import MeasurementRepository, {
-    MeasurementStats,
-} from "backend/dal/repositories/MeasurementRepository";
-import {MeasuredParameters, Pollutant} from "backend/dal/entities/Pollutant";
+import {Measurement} from "common/entities/Measurement";
+import MeasurementRepository from "backend/dal/repositories/MeasurementRepository";
+import {MeasuredParameters, Pollutant} from "common/entities/Pollutant";
 import {MongoCrudRepository} from "backend/dal/repositories/MongoCrudRepository";
 import MeasurementModel, {MeasurementDocument} from "backend/dal/schemas/MeasurementSchema";
 import mongoose from "mongoose";
-import {PaginationResult} from "backend/dal/repositories/Results";
+import {MeasurementStats, PaginationResult} from "common/Results";
 
 export class MeasurementRepositoryImpl extends MongoCrudRepository<MeasurementDocument> implements MeasurementRepository {
     constructor() {
@@ -65,7 +63,9 @@ export class MeasurementRepositoryImpl extends MongoCrudRepository<MeasurementDo
         if (filter.station_id) match.station_id = filter.station_id;
         if (filter.start_date || filter.end_date) {
             match.measurement_time = {};
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             if (filter.start_date) match.measurement_time.$gte = filter.start_date;
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             if (filter.end_date) match.measurement_time.$lte = filter.end_date;
         }
 

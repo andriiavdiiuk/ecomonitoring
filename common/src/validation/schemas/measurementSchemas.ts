@@ -1,6 +1,6 @@
-import {AveragingPeriod, MeasuredParameters, Pollutant, QualityFlag, Unit} from "backend/dal/entities/Pollutant";
+import {AveragingPeriod, MeasuredParameters, Pollutant, QualityFlag, Unit} from "common/entities/Pollutant";
 import {z} from "zod";
-import {Status} from "backend/dal/entities/Station";
+import {Status} from "common/entities/Station";
 
 export const MetadataSchema = z.object({
     source: z.string(),

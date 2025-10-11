@@ -4,38 +4,36 @@ import InputField from "frontend/components/input/InputField.tsx";
 import {useParams} from "react-router";
 import {useNavigate} from "react-router-dom";
 import AppRoutes from "frontend/AppRoutes.tsx";
-import measurementService, {type Measurement, type MeasurementUpdate} from "frontend/services/MeasurementService.ts";
+import measurementService  from "frontend/services/MeasurementService.ts";
 import SelectField from "frontend/components/input/SelectField.tsx";
 import {useUser} from "frontend/components/auth/UserContext.tsx";
-import {
-    type FormErrors,
-    mapValidationErrors,
-    type ValidationErrorResponse
-} from "frontend/services/ValidationService.ts";
 import axios from "axios";
+import type {Measurement} from "common/entities/Measurement.ts";
+import {Status} from "common/entities/Station.ts";
+import {AveragingPeriod, MeasuredParameters, QualityFlag, Unit} from "common/entities/Pollutant.ts";
+import type {MeasurementThreshold, ProblemDetail, ProblemDetailErrors} from "common/Results.ts";
+
 export default function EditMeasurementPage(): JSX.Element {
-    const {station_id, measurement_id} = useParams<{ station_id: string,measurement_id:string }>();
-    const [errors, setErrors] = useState<FormErrors<Measurement>>();
+    const {station_id, measurement_id} = useParams<{ station_id: string, measurement_id: string }>();
+    const [errors, setErrors] = useState<ProblemDetailErrors<Measurement>>();
     const navigate = useNavigate();
     const userContext = useUser();
     const now = new Date();
-    now.setMinutes(now.getMinutes()-now.getTimezoneOffset());
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
     const [form, setForm] = useState<Partial<Measurement>>({
         station_id: station_id,
-        status: "active",
-        measurement_time: now.toISOString().slice(0, 16),
+        status: Status.Active,
+        measurement_time: now,
         pollutants: [
             {
-                pollutant: "PM2.5",
+                pollutant: MeasuredParameters.PM25,
                 value: 0,
-                unit: "ug/m3",
-                averaging_period: "1 hour",
-                quality_flag: "valid",
+                unit: Unit.UgPerM3,
+                averaging_period: AveragingPeriod.OneMinute,
+                quality_flag: QualityFlag.Valid,
             },
         ],
     });
-
-
 
 
     useEffect(() => {
@@ -44,7 +42,7 @@ export default function EditMeasurementPage(): JSX.Element {
                 .then((res) => {
                     const time = new Date(res.measurement_time);
                     time.setMinutes(time.getMinutes() - time.getTimezoneOffset());
-                    res.measurement_time = time.toISOString().slice(0,16)
+                    res.measurement_time = time;
                     setForm(res);
                 }).catch((err: unknown) => {
                 console.log(err);
@@ -54,14 +52,14 @@ export default function EditMeasurementPage(): JSX.Element {
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
-        setForm(prev => ({ ...prev, [name]: value }));
+        const {name, value} = e.target;
+        setForm(prev => ({...prev, [name]: value}));
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        let res: Promise<MeasurementUpdate>;
+        let res: Promise<MeasurementThreshold>;
 
         if (measurement_id) {
             res = measurementService.updateMeasurement(form);
@@ -76,10 +74,8 @@ export default function EditMeasurementPage(): JSX.Element {
             })
             .catch((err: unknown) => {
                 if (axios.isAxiosError(err) && err.response?.data) {
-                    const data = err.response.data as ValidationErrorResponse;
-                    const errors = mapValidationErrors<Measurement>(data.errors);
-                    console.log(errors);
-                    setErrors(errors);
+                    const data = err.response.data as ProblemDetail<Measurement>;
+                    setErrors(data.errors);
                 }
             })
     };
@@ -92,7 +88,7 @@ export default function EditMeasurementPage(): JSX.Element {
                 [field]: field === "value" ? Number(value) : value
             };
 
-            return { ...prev, pollutants };
+            return {...prev, pollutants};
         });
     };
 
@@ -121,17 +117,17 @@ export default function EditMeasurementPage(): JSX.Element {
             pollutants: [
                 ...(prev.pollutants ?? []),
                 {
-                    pollutant: "",
+                    pollutant: MeasuredParameters.PM25,
                     value: 0,
-                    unit: "",
-                    averaging_period: "",
-                    quality_flag: "",
+                    unit: Unit.UgPerM3,
+                    averaging_period: AveragingPeriod.OneMinute,
+                    quality_flag: QualityFlag.Valid,
                 },
             ],
         }));
     };
 
-    return  (
+    return (
         <div className={styles.container}>
 
             {userContext.user?.isRole("admin") &&
@@ -140,8 +136,8 @@ export default function EditMeasurementPage(): JSX.Element {
                 </div>
             }
 
-            {!measurement_id && <h2>Create Station Measurement</h2> }
-            {measurement_id && <h2>Edit Station Measurement</h2> }
+            {!measurement_id && <h2>Create Station Measurement</h2>}
+            {measurement_id && <h2>Edit Station Measurement</h2>}
             <form onSubmit={handleSubmit}>
 
                 <InputField
@@ -156,8 +152,8 @@ export default function EditMeasurementPage(): JSX.Element {
                     label="Measurement Time"
                     name="measurement_time"
                     type="datetime-local"
-                    error={errors?.measurement_time}
-                    value={form.measurement_time}
+                    error={errors?.measurement_time as unknown as string[]}
+                    value={form.measurement_time?.toISOString().slice(0, 16)}
                     onChange={handleChange}
                 />
 
@@ -174,21 +170,18 @@ export default function EditMeasurementPage(): JSX.Element {
                                 <SelectField
                                     label="Pollutant"
                                     name="pollutant"
-                                    error={errors?.pollutants[i].pollutant}
+                                    error={errors?.pollutants?.[i]?.pollutant}
                                     value={pollutant.pollutant}
-                                    onChange={e => { handlePollutantChange(i, "pollutant", e.target.value); }}
+                                    onChange={e => {
+                                        handlePollutantChange(i, "pollutant", e.target.value);
+                                    }}
                                 >
                                     <option value="">Select pollutant</option>
-                                    <option value="PM2.51">PM2.51</option>
-                                    <option value="PM10">PM10</option>
-                                    <option value="Temperature">Temperature</option>
-                                    <option value="Humidity">Humidity</option>
-                                    <option value="Pressure">Pressure</option>
-                                    <option value="Air Quality Index">Air Quality Index</option>
-                                    <option value="NO2">NO2</option>
-                                    <option value="SO2">SO2</option>
-                                    <option value="CO">CO</option>
-                                    <option value="O3">O3</option>
+                                    {Object.values(MeasuredParameters).map((param) => (
+                                        <option key={param} value={param}>
+                                            {param}
+                                        </option>
+                                    ))}
                                 </SelectField>
                             </div>
 
@@ -197,27 +190,28 @@ export default function EditMeasurementPage(): JSX.Element {
                                 name="value"
                                 type="number"
                                 step="any"
-                                error={errors?.pollutants[i].value}
+                                error={errors?.pollutants?.[i]?.value}
                                 value={pollutant.value}
-                                onChange={e => { handlePollutantChange(i, "value", e.target.value); }}
+                                onChange={e => {
+                                    handlePollutantChange(i, "value", e.target.value);
+                                }}
                             />
-
                             <div>
                                 <SelectField
                                     label="Unit"
                                     name="unit"
-                                    error={errors?.pollutants[i].unit}
+                                    error={errors?.pollutants?.[i]?.unit}
                                     value={pollutant.unit}
-                                    onChange={e => { handlePollutantChange(i, "unit", e.target.value); }}
+                                    onChange={e => {
+                                        handlePollutantChange(i, "unit", e.target.value);
+                                    }}
                                 >
                                     <option value="">Select unit</option>
-                                    <option value="ug/m3">ug/m3</option>
-                                    <option value="Celcius">Celcius</option>
-                                    <option value="%">%</option>
-                                    <option value="hPa">hPa</option>
-                                    <option value="aqi">aqi</option>
-                                    <option value="mg/m3">mg/m3</option>
-                                    <option value="ppm">ppm</option>
+                                    {Object.values(Unit).map((param) => (
+                                        <option key={param} value={param}>
+                                            {param}
+                                        </option>
+                                    ))}
                                 </SelectField>
                             </div>
 
@@ -226,17 +220,18 @@ export default function EditMeasurementPage(): JSX.Element {
                                 <SelectField
                                     label="Averaging Period"
                                     name="averaging_period"
-                                    error={errors?.pollutants[i].averaging_period}
+                                    error={errors?.pollutants?.[i]?.averaging_period}
                                     value={pollutant.averaging_period}
-                                    onChange={e => { handlePollutantChange(i, "averaging_period", e.target.value); }}
+                                    onChange={e => {
+                                        handlePollutantChange(i, "averaging_period", e.target.value);
+                                    }}
                                 >
                                     <option value="">Select period</option>
-                                    <option value="1 minute">1 minute</option>
-                                    <option value="2 minutes">2 minutes</option>
-                                    <option value="5 minutes">5 minutes</option>
-                                    <option value="15 minutes">15 minutes</option>
-                                    <option value="1 hour">1 hour</option>
-                                    <option value="24 hours">24 hours</option>
+                                    {Object.values(AveragingPeriod).map((param) => (
+                                        <option key={param} value={param}>
+                                            {param}
+                                        </option>
+                                    ))}
                                 </SelectField>
                             </div>
 
@@ -244,34 +239,39 @@ export default function EditMeasurementPage(): JSX.Element {
                                 <SelectField
                                     label="Quality Flag"
                                     name="quality_flag"
-                                    error={errors?.pollutants[i].quality_flag}
+                                    error={errors?.pollutants?.[i]?.quality_flag}
                                     value={pollutant.quality_flag}
-                                    onChange={e => { handlePollutantChange(i, "quality_flag", e.target.value); }}
+                                    onChange={e => {
+                                        handlePollutantChange(i, "quality_flag", e.target.value);
+                                    }}
                                 >
                                     <option value="">Select flag</option>
-                                    <option value="valid">valid</option>
-                                    <option value="invalid">invalid</option>
-                                    <option value="estimated">estimated</option>
-                                    <option value="preliminary1">preliminary1</option>
+                                    {Object.values(QualityFlag).map((param) => (
+                                        <option key={param} value={param}>
+                                            {param}
+                                        </option>
+                                    ))}
                                 </SelectField>
                             </div>
 
                             <button
                                 className={styles.button_danger}
                                 type="button"
-                                onClick={() => { handleRemove(i); }}>
+                                onClick={() => {
+                                    handleRemove(i);
+                                }}>
                                 Remove
                             </button>
                         </div>
                     ))}
 
-                    <button  type="button" onClick={addPollutant}>
+                    <button type="button" onClick={addPollutant}>
                         + Add Pollutant
                     </button>
                 </fieldset>
 
 
-                <InputField type="submit" value="Submit" />
+                <InputField type="submit" value="Submit"/>
             </form>
         </div>
     );

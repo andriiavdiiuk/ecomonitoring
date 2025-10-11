@@ -3,14 +3,10 @@ import styles from "./RegisterUserPage.module.scss"
 import userService from "frontend/services/UserService.ts";
 import InputField from "frontend/components/input/InputField.tsx";
 import axios from "axios";
-import {
-    type FormErrors,
-    mapValidationErrors,
-    type ValidationErrorResponse
-} from "frontend/services/ValidationService.ts";
 import { useNavigate } from 'react-router-dom';
 import AppRoutes from "frontend/AppRoutes.tsx";
 import {useUser} from "frontend/components/auth/UserContext.tsx";
+import type {ProblemDetail, ProblemDetailErrors} from "common/Results.ts";
 interface FormData {
     username: string,
     email: string,
@@ -25,7 +21,7 @@ export default function RegisterUserPage(): JSX.Element {
     });
 
     const [error, setError] = useState<string | null>(null);
-    const [errors, setFormErrors] = useState<FormErrors<FormData>>();
+    const [errors, setFormErrors] = useState<ProblemDetailErrors<FormData>>();
     const [success, setSuccess] = useState<boolean>(false);
     const {setLoggedIn} = useUser();
     const navigate = useNavigate();
@@ -56,7 +52,10 @@ export default function RegisterUserPage(): JSX.Element {
         }
 
         userService
-            .register(formData.username, formData.email, formData.password)
+            .register({
+                username:formData.username,
+                email: formData.email,
+                password: formData.password})
             .then(async () => {
                 setSuccess(true);
                 setFormErrors(undefined);
@@ -67,9 +66,9 @@ export default function RegisterUserPage(): JSX.Element {
             .catch((err: unknown) => {
                 if (axios.isAxiosError(err) && err.response?.data) {
                     setError(null);
-                    const data = err.response.data as ValidationErrorResponse;
+                    const data = err.response.data as ProblemDetail<FormData>;
 
-                    setFormErrors(mapValidationErrors(data.errors));
+                    setFormErrors(data.errors);
 
                 }
             });

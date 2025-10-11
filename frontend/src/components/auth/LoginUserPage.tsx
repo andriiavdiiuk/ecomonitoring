@@ -3,21 +3,14 @@ import styles from "./LoginUserPage.module.scss"
 import userService from "frontend/services/UserService.ts";
 import InputField from "frontend/components/input/InputField.tsx";
 import axios from "axios";
-import {mapValidationErrors, type ValidationErrorResponse} from "frontend/services/ValidationService.ts";
 import { useNavigate } from 'react-router-dom';
 import AppRoutes from "frontend/AppRoutes.tsx";
 import {useUser} from "frontend/components/auth/UserContext.tsx";
+import type {ProblemDetail, ProblemDetailErrors} from "common/Results.ts";
 interface FormData {
     username: string,
     password: string,
 }
-
-interface FormErrors {
-    username: string[],
-    password: string[],
-    [key: string]: string[]
-}
-
 
 export default function LoginUserPage(): JSX.Element {
     const [formData, setFormData] = useState<FormData>({
@@ -26,7 +19,7 @@ export default function LoginUserPage(): JSX.Element {
     });
 
     const [error, setError] = useState<string | null>(null);
-    const [errors, setFormErrors] = useState<FormErrors>();
+    const [errors, setFormErrors] = useState<ProblemDetailErrors<FormData>>();
     const [success, setSuccess] = useState<boolean>(false);
     const {setLoggedIn} = useUser();
 
@@ -58,7 +51,7 @@ export default function LoginUserPage(): JSX.Element {
         }
 
         userService
-            .login(formData.username, formData.password)
+            .login({username: formData.username, password: formData.password})
             .then(async () => {
                 setSuccess(true);
                 setFormErrors(undefined);
@@ -69,17 +62,9 @@ export default function LoginUserPage(): JSX.Element {
             .catch((err: unknown) => {
                 if (axios.isAxiosError(err) && err.response?.data) {
                     setError(null);
-                    const data = err.response.data as ValidationErrorResponse;
+                    const data = err.response.data as ProblemDetail<FormData>;
 
-
-                    const fieldErrors: FormErrors = mapValidationErrors<FormErrors>(data.errors,{
-                        username: [''],
-                        password: [''],
-                    });
-
-
-                    setFormErrors(fieldErrors);
-
+                    setFormErrors(data.errors);
                 }
             });
     }

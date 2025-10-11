@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
-import Station, {Status} from "backend/dal/entities/Station";
-import {MeasuredParameters} from "backend/dal/entities/Pollutant";
+import Station, {Status} from "common/entities/Station";
+import {MeasuredParameters} from "common/entities/Pollutant";
 
 export interface StationDocument extends Station, Document {}
 

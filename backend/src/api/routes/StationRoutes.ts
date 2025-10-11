@@ -2,7 +2,7 @@ import express, {Request, Response, Router} from "express";
 
 import StationRepositoryImpl from "backend/dal/repositories/impl/StationRepositoryImpl";
 import {authMiddleware} from "backend/api/middleware/authMiddleware";
-import {Roles} from "backend/dal/entities/Roles";
+import Roles from "common/entities/Roles";
 import StationController from "backend/api/controllers/StationController";
 import {StationServiceImpl} from "backend/bll/services/impl/StationServiceImpl";
 import {RequestSource, validationMiddleware} from "backend/api/middleware/validationMiddleware";
@@ -13,7 +13,7 @@ import {
     StationIdParamsSchema,
     StationSchema,
     UpdateStationSchema
-} from "backend/bll/validation/schemas/stationSchemas";
+} from "common/validation/schemas/stationSchemas";
 import JwtUtils from "backend/api/security/JwtUtils";
 import Config from "backend/api/configuration/config";
 

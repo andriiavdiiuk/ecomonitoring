@@ -15,9 +15,15 @@
     "paths": {
       "*": ["./node_modules/*"],
       "backend/*": ["./src/*"],
+      "common/*": ["../common/src/*"],
       "backend_test/*":["./test/*"]
     }
   },
+  "references": [
+    {
+      "path": "../common/tsconfig.json"
+    }
+  ],
   "include": ["./**/*.ts"],
   "exclude": ["node_modules"],
   "tsc-alias": {

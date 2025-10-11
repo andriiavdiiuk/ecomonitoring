@@ -5,7 +5,8 @@ import {
     GetStationsDTO,
     NearbyStationsDTO,
     StationDTO
-} from "backend/bll/validation/schemas/stationSchemas";
+} from "common/validation/schemas/stationSchemas";
+import Station from "common/entities/Station";
 
 export default class StationController {
     private readonly stationService: StationService
@@ -16,7 +17,7 @@ export default class StationController {
 
     async getStations(req: Request, res: Response,getStationsDto: GetStationsDTO): Promise<Response> {
         const stations = await this.stationService.getStations(getStationsDto);
-        return res.status(200).json({stations: stations.data, pagination: stations.pagination});
+        return res.status(200).json(stations);
     }
 
     async getStationById(req: Request, res: Response, id: string): Promise<Response> {
@@ -30,12 +31,12 @@ export default class StationController {
     }
 
     async createStation(req: Request, res: Response, stationDto: StationDTO): Promise<Response> {
-        const station = await this.stationService.createStation(stationDto);
+        const station = await this.stationService.createStation(stationDto as Station);
         return res.status(201).json(station);
     }
 
     async updateStation(req: Request, res: Response, stationDto: StationDTO): Promise<Response> {
-        const station = await this.stationService.updateStation(stationDto);
+        const station = await this.stationService.updateStation(stationDto as Station);
 
         if (!station) {
             sendProblemDetail(req, res, 404, "Station not found")

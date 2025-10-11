@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import {AveragingPeriod, MeasuredParameters, Pollutant, QualityFlag, Unit} from "../entities/Pollutant";
+import {AveragingPeriod, MeasuredParameters, Pollutant, QualityFlag, Unit} from "common/entities/Pollutant";
 
 export interface PollutantDocument extends Pollutant, Document {}
 

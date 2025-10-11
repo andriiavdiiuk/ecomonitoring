@@ -1,12 +1,14 @@
 import DataTable from "frontend/components/table/DataTable.tsx";
-import stationService, {type StationResponse} from "frontend/services/StationService.ts";
-import {useEffect, useState} from "react";
+import stationService from "frontend/services/StationService.ts";
+import {type JSX, useEffect, useState} from "react";
 import styles from "./StationsTablePage.module.scss";
 import Pagination from "frontend/components/table/Pagination.tsx";
 import AppRoutes from "frontend/AppRoutes.tsx";
 import {useNavigate} from "react-router-dom";
 import SelectField from "frontend/components/input/SelectField.tsx";
 import InputField from "frontend/components/input/InputField.tsx";
+import type {PaginationResult} from "common/Results.ts";
+import type Station from "common/entities/Station.ts";
 
 interface Search {
     by: string;
@@ -14,7 +16,7 @@ interface Search {
 }
 
 export default function StationsTablePage() {
-    const [stations, setStations] = useState<StationResponse>();
+    const [stations, setStations] = useState<PaginationResult<Station[]>>();
     const [tableData, setTableData] = useState<(string)[][]>([]);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [search, setSearch] = useState<Search>({by: '', value: ''});
@@ -30,11 +32,11 @@ export default function StationsTablePage() {
             stationService.getStations({page: currentPage, limit: 20, ...params})
                 .then(res => {
                     setStations(res);
-                    const mapped = res.stations.map(station => [
-                        station.station_id ?? '',
-                        station.city_name ?? '',
-                        station.station_name ?? '',
-                        station.platform_name ?? '',
+                    const mapped = res.data.map(station => [
+                        station.station_id,
+                        station.city_name,
+                        station.station_name,
+                        station.platform_name,
                     ]);
                     setTableData(mapped);
                 })
@@ -55,8 +57,8 @@ export default function StationsTablePage() {
         "Platform",
     ];
 
-    const handleRowClick = (_row: string[], index: number, _id: string | null): void => {
-        const route = AppRoutes.Station.replace(":id", stations?.stations[index].station_id ?? '');
+    const handleRowClick = (_row: (string | JSX.Element)[], index: number, _id: string | null): void => {
+        const route = AppRoutes.Station.replace(":id", stations?.data[index].station_id ?? '');
 
         navigate(route)?.then(() => {
         })

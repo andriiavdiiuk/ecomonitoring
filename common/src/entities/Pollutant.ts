@@ -37,7 +37,6 @@ export enum QualityFlag {
     Preliminary = 'preliminary',
 }
 
-
 export interface Pollutant {
     pollutant: MeasuredParameters;
     value: number;

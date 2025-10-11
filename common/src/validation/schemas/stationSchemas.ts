@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { MeasuredParameters } from "backend/dal/entities/Pollutant";
-import {Status} from "backend/dal/entities/Station";
+import { MeasuredParameters } from "common/entities/Pollutant";
+import {Status} from "common/entities/Station";
 
 
 const GeolocationSchema = z.object({

@@ -1,31 +1,30 @@
 import React, {type JSX, useEffect, useState} from "react";
-import stationService, {type Station} from "frontend/services/StationService.ts";
+import stationService from "frontend/services/StationService.ts";
 import styles from './EditStationPage.module.scss'
 import InputField from "frontend/components/input/InputField.tsx";
 import {useParams} from "react-router";
 import {useNavigate} from "react-router-dom";
 import AppRoutes from "frontend/AppRoutes.tsx";
-import {
-    type FormErrors,
-    mapValidationErrors,
-    type ValidationErrorResponse
-} from "frontend/services/ValidationService.ts";
 import axios from "axios";
+import type Station from "common/entities/Station.ts";
+import { Status } from "common/entities/Station.ts";
+import {MeasuredParameters} from "common/entities/Pollutant.ts";
+import type {ProblemDetail, ProblemDetailErrors} from "common/Results.ts";
 
 
 export default function EditStationPage(): JSX.Element {
-    const [form, setForm] = useState<Station>({
-        station_id: undefined,
-        city_name: undefined,
-        station_name: undefined,
-        local_name: undefined,
-        timezone: undefined,
+    const [form, setForm] = useState<Partial<Station>>({
+        station_id: '',
+        city_name: '',
+        station_name: '',
+        local_name: '',
+        timezone: '',
         geolocation: {type: "Point", coordinates: [0, 0]},
-        platform_name: undefined,
-        status: "active",
+        platform_name: '',
+        status: Status.Active,
         measured_parameters: [],
     });
-    const [errors, setErrors] = useState<FormErrors<Station>>();
+    const [errors, setErrors] = useState<ProblemDetailErrors<Station>>();
 
     const {id} = useParams<{ id: string }>();
     const navigate = useNavigate();
@@ -62,7 +61,7 @@ export default function EditStationPage(): JSX.Element {
         } else if (name === "measured_parameters") {
             const params = Array.from(
                 (e.target as HTMLSelectElement).selectedOptions,
-                option => option.value
+                option => option.value as MeasuredParameters
             );
             setForm(prev => ({...prev, measured_parameters: params}));
         } else {
@@ -87,11 +86,9 @@ export default function EditStationPage(): JSX.Element {
             })
             .catch((err: unknown) => {
                 if (axios.isAxiosError(err) && err.response?.data) {
-                    const data = err.response.data as ValidationErrorResponse;
+                    const data = err.response.data as ProblemDetail<Station>;
 
-                    const fieldErrors: FormErrors<Station> = mapValidationErrors(data.errors);
-                    console.log(fieldErrors);
-                    setErrors(fieldErrors);
+                    setErrors(data.errors);
                 }
             })
     };
@@ -134,13 +131,13 @@ export default function EditStationPage(): JSX.Element {
                             min="0"
                             max="360"
                             step="any"
-                            error={errors?.geolocation}
+                            error={errors?.geolocation?.coordinates?.[0]}
                             value={form.geolocation?.coordinates[0]}
                             onChange={handleChange}/>
                 <InputField label="Latitude"
                             name="latitude"
                             type="number"
-                            error={errors?.geolocation}
+                            error={errors?.geolocation?.coordinates?.[1]}
                             value={form.geolocation?.coordinates[1]}
                             min="0"
                             max="360"
@@ -159,18 +156,7 @@ export default function EditStationPage(): JSX.Element {
 
                 <fieldset>
                     <legend>Measured Parameters</legend>
-                    {[
-                        "PM2.5",
-                        "PM10",
-                        "Temperature",
-                        "Humidity",
-                        "Pressure",
-                        "Air Quality Index",
-                        "NO2",
-                        "SO2",
-                        "CO",
-                        "O3",
-                    ].map(param => (
+                    {Object.values(MeasuredParameters).map(param => (
                         <div key={param}>
                             <InputField
                                 type="checkbox"
@@ -194,8 +180,8 @@ export default function EditStationPage(): JSX.Element {
                 </fieldset>
 
                 <span className={styles.error}>
-                    {errors?.measured_parameters
-                        ?.flatMap(obj => Object.values(obj).flat())
+                    {(errors?.measured_parameters??[])
+                        .flatMap(obj => Object.values(obj ?? {}).flat())
                         .find(msg => msg !== "")}
                 </span>
                 <InputField type="submit" value="Submit"/>

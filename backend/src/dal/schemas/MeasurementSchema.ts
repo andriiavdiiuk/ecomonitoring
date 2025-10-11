@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import {Measurement} from "backend/dal/entities/Measurement";
-import {Status} from "backend/dal/entities/Station";
+import {Measurement} from "common/entities/Measurement";
+import {Status} from "common/entities/Station";
 import PollutantModel from "backend/dal/schemas/PollutantSchema";
 import PollutantSchema from "backend/dal/schemas/PollutantSchema";
 

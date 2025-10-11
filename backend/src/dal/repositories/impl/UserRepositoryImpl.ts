@@ -1,4 +1,4 @@
-import {User} from "backend/dal/entities/User";
+import {User} from "common/entities/User";
 import UserRepository from "backend/dal/repositories/UserRepository";
 import {MongoCrudRepository} from "backend/dal/repositories/MongoCrudRepository";
 import UserModel, {UserDocument} from "backend/dal/schemas/UserSchema";

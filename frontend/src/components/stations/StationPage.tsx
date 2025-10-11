@@ -1,10 +1,7 @@
 import {generatePath, useParams} from "react-router";
-import {type JSX, useEffect, useState} from "react";
-import stationService, {type Station} from "frontend/services/StationService.ts";
-import measurementService, {
-    type Measurement,
-    type MeasurementResponse,
-} from "frontend/services/MeasurementService.ts";
+import React, {type JSX, useEffect, useState} from "react";
+import stationService from "frontend/services/StationService.ts";
+import measurementService from "frontend/services/MeasurementService.ts";
 import DataTable from "frontend/components/table/DataTable.tsx";
 import styles from './StationPage.module.scss';
 import Pagination from "frontend/components/table/Pagination.tsx";
@@ -13,6 +10,10 @@ import InputField from "frontend/components/input/InputField.tsx";
 import {useUser} from "frontend/components/auth/UserContext.tsx";
 import AppRoutes from "frontend/AppRoutes.tsx";
 import {Link, useNavigate} from "react-router-dom";
+import type Station from "common/entities/Station.ts";
+import type {Measurement} from "common/entities/Measurement.ts";
+import {MeasuredParameters} from "common/entities/Pollutant.ts";
+import type {PaginationResult} from "common/Results.ts";
 
 interface Search {
     pollutant: string,
@@ -23,7 +24,7 @@ interface Search {
 export default function StationPage(): JSX.Element {
     const {id} = useParams<{ id: string }>() as { id: string };
     const [station, setStation] = useState<Station | null>(null);
-    const [measurements, setMeasurements] = useState<MeasurementResponse>();
+    const [measurements, setMeasurements] = useState<PaginationResult<Measurement[]>>();
     const [tableData, setTableData] = useState<(string | JSX.Element)[][]>([]);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [search, setSearch] = useState<Search>({pollutant: '', start_date: '', end_date: ''});
@@ -50,21 +51,20 @@ export default function StationPage(): JSX.Element {
             if (search.start_date.length > 0) params.start_date = search.start_date;
             if (search.end_date.length > 0) params.end_date = search.end_date;
 
-                measurementService.getMeasurements({station_id: id, page: currentPage, limit: 20, ...params})
+            measurementService.getMeasurements({station_id: id, page: currentPage, limit: 20, ...params})
                 .then((res) => {
                     setMeasurements(res);
                     const mapped: (string | JSX.Element)[][] = [];
-                    res.measurement.forEach((m: Measurement) => {
+                    res.data.forEach((m: Measurement) => {
                         m.pollutants.forEach((p) => {
                             let edit: string | JSX.Element = '';
-                            if (userContext.user?.isRole('admin'))
-                            {
+                            if (userContext.user?.isRole('admin')) {
                                 const path = generatePath(AppRoutes.EditMeasurement, {
                                     station_id: id,
                                     measurement_id: m._id,
                                 })
 
-                                edit = <Link to={path} >Edit</Link>;
+                                edit = <Link to={path}>Edit</Link>;
                             }
 
                             mapped.push([
@@ -113,8 +113,7 @@ export default function StationPage(): JSX.Element {
 
     const header = ["Time", "Pollutants", "Value"];
 
-    if (userContext.user?.isRole('admin'))
-    {
+    if (userContext.user?.isRole('admin')) {
         header.push('Controls');
     }
 
@@ -141,21 +140,20 @@ export default function StationPage(): JSX.Element {
                 {
                     station.local_name && <p><strong>Local name:</strong> {station.local_name}</p>
                 }
+
+                <p><strong>Status:</strong> {station.status}</p>
+
+
+                <p>
+                    <strong>Coordinates:</strong>{" "}
+                    {station.geolocation.coordinates[1]}, {station.geolocation.coordinates[0]}
+                </p>
+
+
                 {
-                    station.status && <p><strong>Status:</strong> {station.status}</p>
-                }
-                {
-                    station.geolocation?.coordinates && (
+                    (station.measured_parameters).length > 0 && (
                         <p>
-                            <strong>Coordinates:</strong>{" "}
-                            {station.geolocation.coordinates[1]}, {station.geolocation.coordinates[0]}
-                        </p>
-                    )
-                }
-                {
-                    (station.measured_parameters ?? []).length > 0 && (
-                        <p>
-                            <strong>Measured parameters:</strong> {station.measured_parameters?.join(", ")}
+                            <strong>Measured parameters:</strong> {station.measured_parameters.join(", ")}
                         </p>
                     )
                 }
@@ -166,7 +164,8 @@ export default function StationPage(): JSX.Element {
 
                 {userContext.user?.isRole("admin") &&
                     <div className={styles.controls}>
-                        <Link className={styles.button} to={AppRoutes.NewMeasurement.replace(':station_id',id)}>Add Measurement</Link>
+                        <Link className={styles.button} to={AppRoutes.NewMeasurement.replace(':station_id', id)}>Add
+                            Measurement</Link>
                     </div>
                 }
 
@@ -178,16 +177,11 @@ export default function StationPage(): JSX.Element {
                                  value={search.pollutant}
                                  onChange={handleChange}>
                         <option value="">Pollutant</option>
-                        <option value="PM25">PM2.5</option>
-                        <option value="PM10">PM10</option>
-                        <option value="Temperature">Temperature</option>
-                        <option value="Humidity">Humidity</option>
-                        <option value="Pressure">Pressure</option>
-                        <option value="AirQualityIndex">Air Quality Index</option>
-                        <option value="NO2">NO2</option>
-                        <option value="SO2">SO2</option>
-                        <option value="CO">CO</option>
-                        <option value="O3">O3</option>
+                        {Object.values(MeasuredParameters).map((param) => (
+                            <option key={param} value={param}>
+                                {param}
+                            </option>
+                        ))}
                     </SelectField>
                     <InputField className={styles.search_field}
                                 type="date"

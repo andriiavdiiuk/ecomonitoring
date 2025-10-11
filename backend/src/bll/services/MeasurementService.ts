@@ -1,27 +1,9 @@
-import {PaginationResult} from "backend/dal/repositories/Results";
-import {Measurement} from "backend/dal/entities/Measurement";
-import {MeasurementStats} from "backend/dal/repositories/MeasurementRepository";
+import {MeasurementStats, PaginationResult, ThresholdExceedance} from "common/Results";
+import {Measurement} from "common/entities/Measurement";
 import {
     GetMeasurementDTO, MeasurementDTO,
     MeasurementFilterDTO,
-} from "backend/bll/validation/schemas/measurementSchemas";
-
-export enum Severity {
-    Normal = "normal",
-    Warning = "warning",
-    Alert = "alert",
-    Emergency = "emergency",
-}
-
-export type ThresholdExceedance = {
-    pollutant: string;
-    value: number;
-    threshold: number;
-    severity: Severity;
-    ratio: string;
-}
-
-
+} from "common/validation/schemas/measurementSchemas";
 
 export default interface MeasurementService {
     getMeasurements(filter: GetMeasurementDTO): Promise<PaginationResult<Measurement[]>>;

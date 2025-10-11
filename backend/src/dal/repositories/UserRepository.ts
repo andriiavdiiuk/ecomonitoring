@@ -1,4 +1,4 @@
-import {User} from "backend/dal/entities/User";
+import {User} from "common/entities/User";
 import Repository from "backend/dal/repositories/Repository";
 
 export default interface UserRepository extends Repository<User>{

@@ -1,10 +1,10 @@
-import {Status} from "backend/dal/entities/Station";
-import {Pollutant} from "backend/dal/entities/Pollutant";
+import {Status} from "common/entities/Station";
+import {type Pollutant} from "common/entities/Pollutant"
 
 export interface Measurement {
-    id: string,
+    _id: string,
     station_id: string;
-    status?: Status;
+    status: Status;
     measurement_time: Date;
     pollutants: Pollutant[];
     metadata: {

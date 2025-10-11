@@ -3,7 +3,7 @@
 import request from "supertest";
 import {Express, NextFunction, Request} from "express";
 import {setupTestApp, teardownTestApp} from "backend_test/utilities/setupTestApp";
-import {Roles} from "backend/dal/entities/Roles";
+import Roles from "common/entities/Roles";
 
 function expectStationObject(station: unknown): void {
 
@@ -92,10 +92,10 @@ describe("Station Routes", () => {
         const res = await request(app).get("/api/stations");
         expect(res.status).toBe(200);
 
-        expect(res.body).toHaveProperty("stations");
-        expect(Array.isArray(res.body.stations)).toBe(true);
+        expect(res.body).toHaveProperty("data");
+        expect(Array.isArray(res.body.data)).toBe(true);
 
-        (res.body.stations as []).forEach((station: unknown) => {
+        (res.body.data as []).forEach((station: unknown) => {
             expectStationObject(station);
         });
 
@@ -111,10 +111,10 @@ describe("Station Routes", () => {
         const res = await request(app).get("/api/stations?city=Kyiv&status=active&page=1&limit=10");
         expect(res.status).toBe(200);
 
-        expect(res.body).toHaveProperty("stations");
-        expect(Array.isArray(res.body.stations)).toBe(true);
+        expect(res.body).toHaveProperty("data");
+        expect(Array.isArray(res.body.data)).toBe(true);
 
-        (res.body.stations as []).forEach((station: unknown) => {
+        (res.body.data as []).forEach((station: unknown) => {
             expectStationObject(station);
         });
 

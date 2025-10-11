@@ -1,5 +1,4 @@
-import { Roles } from "backend/dal/entities/Roles";
-import { Document } from "mongoose";
+import Roles from "common/entities/Roles";
 export interface User {
     id: string,
     username: string;
