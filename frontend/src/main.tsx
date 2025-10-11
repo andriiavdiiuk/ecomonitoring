@@ -14,6 +14,7 @@ import StationsTablePage from "frontend/components/stations/StationsTablePage.ts
 import StationPage from "frontend/components/stations/StationPage.tsx";
 import EditStationPage from "frontend/components/stations/EditStationPage.tsx";
 import EditMeasurementPage from "frontend/components/stations/EditMeasurementPage.tsx";
+import RequireAuth from "frontend/components/miscellaneous/RequireAuth.tsx";
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
@@ -24,15 +25,30 @@ createRoot(document.getElementById('root')!).render(
                     <Route index element={<MainPage/>}/>
                     <Route path={AppRoutes.Register} element={<RegisterUserPage/>}/>
                     <Route path={AppRoutes.Login} element={<LoginUserPage/>}/>
-                    <Route path={AppRoutes.Logout} element={<LogoutUserPage />} />
-                    <Route path={AppRoutes.Stations} element={<StationsTablePage />} />
-                    <Route path={AppRoutes.Station} element={<StationPage/>} />
-                    <Route path={AppRoutes.NewStation} element={<EditStationPage />} />
-                    <Route path={AppRoutes.EditStation} element={<EditStationPage />} />
-                    <Route path={AppRoutes.NewMeasurement} element={<EditMeasurementPage />} />
-                    <Route path={AppRoutes.EditMeasurement} element={<EditMeasurementPage />} />
+                    <Route path={AppRoutes.Logout} element={<LogoutUserPage/>}/>
+                    <Route path={AppRoutes.Stations} element={<StationsTablePage/>}/>
+                    <Route path={AppRoutes.Station} element={<StationPage/>}/>
+                    <Route path={AppRoutes.NewStation} element={
+                        <RequireAuth role="admin">
+                            <EditStationPage/>
+                        </RequireAuth>
+                    }/>
+                    <Route path={AppRoutes.EditStation} element={
+                        <RequireAuth role="admin">
+                            <EditStationPage/>
+                        </RequireAuth>
+                    }/>
+                    <Route path={AppRoutes.NewMeasurement} element={
+                        <RequireAuth role="admin">
+                            <EditMeasurementPage/>
+                        </RequireAuth>
+                    }/>
+                    <Route path={AppRoutes.EditMeasurement} element={
+                        <RequireAuth role="admin">
+                            <EditMeasurementPage/>
+                        </RequireAuth>
+                    }/>
                 </Routes>
-                {/*<Footer/>*/}
             </BrowserRouter>
         </UserProvider>
     </StrictMode>,
