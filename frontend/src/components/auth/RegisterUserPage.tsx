@@ -3,7 +3,11 @@ import styles from "./RegisterUserPage.module.scss"
 import userService from "frontend/services/UserService.ts";
 import InputField from "frontend/components/input/InputField.tsx";
 import axios from "axios";
-import {mapValidationErrors, type ValidationErrorResponse} from "frontend/services/ValidationService.ts";
+import {
+    type FormErrors,
+    mapValidationErrors,
+    type ValidationErrorResponse
+} from "frontend/services/ValidationService.ts";
 import { useNavigate } from 'react-router-dom';
 import AppRoutes from "frontend/AppRoutes.tsx";
 import {useUser} from "frontend/components/auth/UserContext.tsx";
@@ -13,14 +17,6 @@ interface FormData {
     password: string,
 }
 
-interface FormErrors {
-    username: string[],
-    email: string[],
-    password: string[],
-    [key: string]: string[]
-}
-
-
 export default function RegisterUserPage(): JSX.Element {
     const [formData, setFormData] = useState<FormData>({
         username: '',
@@ -29,7 +25,7 @@ export default function RegisterUserPage(): JSX.Element {
     });
 
     const [error, setError] = useState<string | null>(null);
-    const [errors, setFormErrors] = useState<FormErrors>();
+    const [errors, setFormErrors] = useState<FormErrors<FormData>>();
     const [success, setSuccess] = useState<boolean>(false);
     const {setLoggedIn} = useUser();
     const navigate = useNavigate();
@@ -73,15 +69,7 @@ export default function RegisterUserPage(): JSX.Element {
                     setError(null);
                     const data = err.response.data as ValidationErrorResponse;
 
-
-                    const fieldErrors: FormErrors = mapValidationErrors<FormErrors>(data.errors,{
-                         username: [''],
-                         email: [''],
-                         password: [''],
-                     });
-
-
-                    setFormErrors(fieldErrors);
+                    setFormErrors(mapValidationErrors(data.errors));
 
                 }
             });

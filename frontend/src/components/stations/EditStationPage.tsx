@@ -5,6 +5,13 @@ import InputField from "frontend/components/input/InputField.tsx";
 import {useParams} from "react-router";
 import {useNavigate} from "react-router-dom";
 import AppRoutes from "frontend/AppRoutes.tsx";
+import {
+    type FormErrors,
+    mapValidationErrors,
+    type ValidationErrorResponse
+} from "frontend/services/ValidationService.ts";
+import axios from "axios";
+
 
 export default function EditStationPage(): JSX.Element {
     const [form, setForm] = useState<Station>({
@@ -18,6 +25,7 @@ export default function EditStationPage(): JSX.Element {
         status: "active",
         measured_parameters: [],
     });
+    const [errors, setErrors] = useState<FormErrors<Station>>();
 
     const {id} = useParams<{ id: string }>();
     const navigate = useNavigate();
@@ -32,10 +40,6 @@ export default function EditStationPage(): JSX.Element {
             })
         }
     }, [id]);
-
-    const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<boolean>(false);
-
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const {name, value} = e.target;
@@ -68,10 +72,6 @@ export default function EditStationPage(): JSX.Element {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        setError(null);
-        setSuccess(false);
-
-
         let res: Promise<Station>;
 
         if (id) {
@@ -82,11 +82,17 @@ export default function EditStationPage(): JSX.Element {
 
         res
             .then((saved) => {
-                setSuccess(true);
+                setErrors(undefined);
                 void navigate(AppRoutes.Station.replace(":id", saved.station_id || ""));
             })
             .catch((err: unknown) => {
-                console.log(err);
+                if (axios.isAxiosError(err) && err.response?.data) {
+                    const data = err.response.data as ValidationErrorResponse;
+
+                    const fieldErrors: FormErrors<Station> = mapValidationErrors(data.errors);
+                    console.log(fieldErrors);
+                    setErrors(fieldErrors);
+                }
             })
     };
 
@@ -94,28 +100,33 @@ export default function EditStationPage(): JSX.Element {
         <div className={styles.container}>
             {!id && <h2>Create New Station</h2>}
             {id && <h2>Edit Station</h2>}
-            {error && <p style={{color: "red"}}>{error}</p>}
-            {success && <p style={{color: "green"}}>Station created successfully!</p>}
             <form onSubmit={handleSubmit}>
-                <InputField label="Station Id"
-                            name="station_id"
-                            value={form.station_id}
-                            onChange={handleChange}/>
+                {!id &&
+                    <InputField label="Station Id"
+                                name="station_id"
+                                value={form.station_id}
+                                error={errors?.station_id}
+                                onChange={handleChange}/>
+                }
                 <InputField label="City"
                             name="city_name"
                             value={form.city_name}
+                            error={errors?.city_name}
                             onChange={handleChange}/>
                 <InputField label="Station Name"
                             name="station_name"
                             value={form.station_name}
+                            error={errors?.station_name}
                             onChange={handleChange}/>
                 <InputField label="Local Name"
                             name="local_name"
                             value={form.local_name}
+                            error={errors?.local_name}
                             onChange={handleChange}/>
                 <InputField label="Timezone"
                             name="timezone"
                             value={form.timezone}
+                            error={errors?.timezone}
                             onChange={handleChange}/>
                 <InputField label="Longitude"
                             name="longitude"
@@ -123,11 +134,13 @@ export default function EditStationPage(): JSX.Element {
                             min="0"
                             max="360"
                             step="any"
+                            error={errors?.geolocation}
                             value={form.geolocation?.coordinates[0]}
                             onChange={handleChange}/>
                 <InputField label="Latitude"
                             name="latitude"
                             type="number"
+                            error={errors?.geolocation}
                             value={form.geolocation?.coordinates[1]}
                             min="0"
                             max="360"
@@ -135,10 +148,12 @@ export default function EditStationPage(): JSX.Element {
                             onChange={handleChange}/>
                 <InputField label="Platform"
                             name="platform_name"
+                            error={errors?.platform_name}
                             value={form.platform_name}
                             onChange={handleChange}/>
                 <InputField label="Status"
                             name="status"
+                            error={errors?.status}
                             value={form.status}
                             onChange={handleChange}/>
 
@@ -156,8 +171,8 @@ export default function EditStationPage(): JSX.Element {
                         "CO",
                         "O3",
                     ].map(param => (
-                        <label key={param} style={{display: "block"}}>
-                            <input
+                        <div key={param}>
+                            <InputField
                                 type="checkbox"
                                 name="measured_parameters"
                                 value={param}
@@ -173,9 +188,16 @@ export default function EditStationPage(): JSX.Element {
                                 }}
                             />
                             {param}
-                        </label>
+                        </div>
                     ))}
+
                 </fieldset>
+
+                <span className={styles.error}>
+                    {errors?.measured_parameters
+                        ?.flatMap(obj => Object.values(obj).flat())
+                        .find(msg => msg !== "")}
+                </span>
                 <InputField type="submit" value="Submit"/>
             </form>
         </div>
