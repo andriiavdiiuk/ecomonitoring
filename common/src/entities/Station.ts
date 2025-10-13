@@ -14,7 +14,7 @@ export default interface Station{
     timezone: string,
     geolocation: {
         type: string,
-        coordinates: number[],
+        coordinates: [number, number],
     },
     platform_name: string,
     status: Status,

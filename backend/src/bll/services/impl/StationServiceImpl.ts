@@ -13,15 +13,7 @@ export class StationServiceImpl implements StationService {
     }
 
     async getStations(filter: GetStationsDTO): Promise<PaginationResult<Station[]>> {
-        const page = filter.page ?? 1;
-        const limit = filter.limit ?? 50;
-
-
-        const query: Partial<Station> = {};
-        if (filter.city) query.city_name = filter.city
-        if (filter.status) query.status = filter.status;
-
-
+        const { page = 1, limit = 50, ...query } = filter;
         return await this.stationRepository.getStationsPaginated(query, {page: page, limit: limit});
     }
 

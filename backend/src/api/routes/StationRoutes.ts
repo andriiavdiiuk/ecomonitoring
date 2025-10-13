@@ -16,7 +16,6 @@ import {
 } from "common/validation/schemas/stationSchemas";
 import JwtUtils from "backend/api/security/JwtUtils";
 import Config from "backend/api/configuration/config";
-
 export default function createStationRoutes(config: Config): Router {
 
     const stationsRoutes = express.Router();

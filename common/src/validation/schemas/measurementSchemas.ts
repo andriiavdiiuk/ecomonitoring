@@ -1,4 +1,4 @@
-import {AveragingPeriod, MeasuredParameters, Pollutant, QualityFlag, Unit} from "common/entities/Pollutant";
+import {AveragingPeriod, MeasuredParameters, QualityFlag, Unit} from "common/entities/Pollutant";
 import {z} from "zod";
 import {Status} from "common/entities/Station";
 

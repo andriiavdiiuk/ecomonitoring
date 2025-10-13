@@ -1,13 +1,17 @@
 @use 'frontend/variables';
+@use 'frontend/mixins';
 .table {
   margin: 50px;
-}
 
+  button {
+    @include mixins.button-style;
+    margin-bottom: 20px;
+  }
+}
 .search {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   flex-grow: 1;
-  gap: 50px;
 
   select {
     padding: 0.6rem 0.8rem;

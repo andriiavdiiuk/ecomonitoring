@@ -1,4 +1,4 @@
-import {Measurement} from "common/entities/Measurement";
+import {type Measurement} from "common/entities/Measurement";
 
 export type ProblemDetailErrors<T> = {
     [K in keyof T]?: T[K] extends object ? ProblemDetailErrors<T[K]> : string[] | undefined

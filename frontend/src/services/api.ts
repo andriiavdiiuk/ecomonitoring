@@ -1,4 +1,5 @@
 import axios, {type AxiosInstance} from "axios";
+import Qs from 'qs';
 
 import Cookies from "universal-cookie";
 
@@ -23,5 +24,16 @@ api.interceptors.request.use(config => {
     }
 });
 
+axios.interceptors.request.use(config => {
+
+    config.paramsSerializer = params => {
+        return Qs.stringify(params, {
+            arrayFormat: "brackets",
+            encode: false
+        });
+    };
+
+    return config;
+});
 
 export default api;

@@ -1,5 +1,5 @@
-import { z } from "zod";
-import { MeasuredParameters } from "common/entities/Pollutant";
+import {z} from "zod";
+import {MeasuredParameters} from "common/entities/Pollutant";
 import {Status} from "common/entities/Station";
 
 
@@ -30,15 +30,15 @@ export const StationSchema = z.object({
     metadata: MetadataSchema.optional(),
 });
 export const UpdateStationSchema = StationSchema
-    .omit({ station_id: true });
+    .omit({station_id: true});
 
 
-export const GetStationsQuerySchema = z.object({
-    city: z.string().optional(),
-    status: z.enum(Status).optional(),
+export const GetStationsQuerySchema = StationSchema.omit({
+    metadata: true
+}).partial().extend({
     page: z.coerce.number().optional(),
     limit: z.coerce.number().optional(),
-});
+})
 
 export const StationIdParamsSchema = z.object({
     id: z.string()
