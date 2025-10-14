@@ -1,0 +1,27 @@
+@use 'frontend/variables';
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+  gap: 1rem;
+
+  button {
+    padding: 0.5rem 1rem;
+    border-radius: variables.$border-radius;
+    border: none;
+    background-color: variables.$primary-color;
+    color: white;
+    cursor: pointer;
+
+    &:disabled {
+      background-color: variables.$input-border;
+      cursor: default;
+    }
+
+    &:hover:enabled {
+      background-color: darken(variables.$primary-color, 10%);
+    }
+  }
+}

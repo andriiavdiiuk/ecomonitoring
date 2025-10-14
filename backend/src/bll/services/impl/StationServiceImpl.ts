@@ -1,8 +1,8 @@
 import StationService from "backend/bll/services/StationService";
-import Station from "backend/dal/entities/Station";
+import Station from "common/entities/Station";
 import StationRepository from "backend/dal/repositories/StationRepository";
-import {PaginationResult} from "backend/dal/repositories/Results";
-import {GetStationsDTO, StationDTO} from "backend/bll/validation/schemas/stationSchemas";
+import {PaginationResult} from "common/Results";
+import {GetStationsDTO, StationDTO} from "common/validation/schemas/stationSchemas";
 
 export class StationServiceImpl implements StationService {
     private readonly stationRepository: StationRepository
@@ -13,15 +13,7 @@ export class StationServiceImpl implements StationService {
     }
 
     async getStations(filter: GetStationsDTO): Promise<PaginationResult<Station[]>> {
-        const page = filter.page ?? 1;
-        const limit = filter.limit ?? 50;
-
-
-        const query: Partial<Station> = {};
-        if (filter.city) query.city_name = filter.city
-        if (filter.status) query.status = filter.status;
-
-
+        const { page = 1, limit = 50, ...query } = filter;
         return await this.stationRepository.getStationsPaginated(query, {page: page, limit: limit});
     }
 
@@ -29,11 +21,11 @@ export class StationServiceImpl implements StationService {
         return await this.stationRepository.findOneBy({station_id: station_id});
     }
 
-    async createStation(station: StationDTO): Promise<Station> {
+    async createStation(station: Station): Promise<Station> {
         return await this.stationRepository.create(station);
     }
 
-    async updateStation(station: StationDTO): Promise<Station | null> {
+    async updateStation(station: Station): Promise<Station | null> {
         return await this.stationRepository.updateBy({station_id: station.station_id}, station);
     }
 

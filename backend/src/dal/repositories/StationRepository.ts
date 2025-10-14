@@ -1,6 +1,6 @@
-import Station, {Status} from "backend/dal/entities/Station";
+import Station from "common/entities/Station";
 import Repository from "backend/dal/repositories/Repository";
-import {PaginationResult} from "backend/dal/repositories/Results";
+import {PaginationResult} from "common/Results";
 
 
 export default interface StationRepository extends Repository<Station> {
@@ -9,7 +9,7 @@ export default interface StationRepository extends Repository<Station> {
     findNearby(longitude: number, latitude: number, maxDistance: number): Promise<Station[]>;
 
     getStationsPaginated(
-        filter?: { city?: string; status?: Status },
+        filter?: Partial<Station>,
         options?: { page?: number; limit?: number; sort?: Record<string, 1 | -1> }
     ): Promise<PaginationResult<Station[]>>;
 }

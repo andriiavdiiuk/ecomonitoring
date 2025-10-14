@@ -1,0 +1,40 @@
+@use 'frontend/variables';
+@use 'frontend/mixins';
+
+
+.container {
+  margin-top: 100px;
+  margin-bottom: 100px;
+  @include mixins.grid-center-style ;
+}
+
+.center_container {
+  padding: 2rem;
+  border: 1px solid variables.$input-border;
+  border-radius: 8px;
+  box-shadow: variables.$box-shadow;
+  width: 400px;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.button {
+  @include mixins.button-style;
+}
+
+.success {
+  color: variables.$success-color;
+  text-align: center;
+}
+.error {
+  color: variables.$error-color;
+}

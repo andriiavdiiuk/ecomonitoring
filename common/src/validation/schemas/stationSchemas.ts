@@ -1,6 +1,6 @@
-import { z } from "zod";
-import { MeasuredParameters } from "backend/dal/entities/Pollutant";
-import {Status} from "backend/dal/entities/Station";
+import {z} from "zod";
+import {MeasuredParameters} from "common/entities/Pollutant";
+import {Status} from "common/entities/Station";
 
 
 const GeolocationSchema = z.object({
@@ -14,7 +14,7 @@ const MetadataSchema = z.object({
     created_at: z.coerce.date(),
     updated_at: z.coerce.date(),
     data_source: z.string(),
-    last_measurement: z.coerce.date()
+    last_measurement: z.coerce.date().optional(),
 });
 
 export const StationSchema = z.object({
@@ -30,15 +30,15 @@ export const StationSchema = z.object({
     metadata: MetadataSchema.optional(),
 });
 export const UpdateStationSchema = StationSchema
-    .omit({ station_id: true });
+    .omit({station_id: true});
 
 
-export const GetStationsQuerySchema = z.object({
-    city: z.string().optional(),
-    status: z.enum(Status).optional(),
+export const GetStationsQuerySchema = StationSchema.omit({
+    metadata: true
+}).partial().extend({
     page: z.coerce.number().optional(),
     limit: z.coerce.number().optional(),
-});
+})
 
 export const StationIdParamsSchema = z.object({
     id: z.string()

@@ -1,15 +1,9 @@
-import {Measurement} from "backend/dal/entities/Measurement";
+import {Measurement} from "common/entities/Measurement";
 import Repository from "backend/dal/repositories/Repository";
-import {MeasuredParameters, Pollutant} from "backend/dal/entities/Pollutant";
-import {PaginationResult} from "backend/dal/repositories/Results";
+import {MeasuredParameters, Pollutant} from "common/entities/Pollutant";
+import {MeasurementStats, PaginationResult} from "common/Results";
 
-export type MeasurementStats = {
-    count: number;
-    avg: number;
-    min: number;
-    max: number;
-    latest: Date;
-};
+
 
 export default interface MeasurementRepository extends Repository<Measurement> {
 

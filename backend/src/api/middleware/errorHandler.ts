@@ -5,17 +5,9 @@ import jwt from "jsonwebtoken";
 import {STATUS_CODES} from "http";
 import Config from "backend/api/configuration/config";
 import { ValidationError, UnathorizedError } from "backend/bll/errors/errors";
+import {ProblemDetail, ProblemDetailErrors} from "common/Results";
 
-interface ProblemDetail {
-    type: string;
-    status: number;
-    title: string;
-    detail: string;
-    instance: string;
-    errors?: Array<Partial<Record<string, string | object>>>;
-}
-
-export function getProblemDetail(req: Request, status: number, detail: string, errors?: Array<Partial<Record<string, string | object>>>): ProblemDetail {
+export function getProblemDetail<T>(req: Request, status: number, detail: string, errors?: ProblemDetailErrors<T>): ProblemDetail<T> {
     return {
         type: "about:blank",
         status: status,
@@ -26,7 +18,7 @@ export function getProblemDetail(req: Request, status: number, detail: string, e
     }
 }
 
-export function sendProblemDetail(req: Request, res: Response, status: number, detail: string, errors?: Array<Partial<Record<string, string | object>>>): Response {
+export function sendProblemDetail<T>(req: Request, res: Response, status: number, detail: string, errors?: ProblemDetailErrors<T>): Response {
     return res.status(status).json(getProblemDetail(req, status, detail, errors));
 }
 
@@ -42,7 +34,7 @@ export function createErrorHandler(config: Config) {
     return function errorHandler(err: Error, req: Request, res: Response, next: NextFunction): Response {
         switch (true) {
             case err instanceof SyntaxError && 'body' in err: {
-                return sendProblemDetail(req, res, 400, "Invalid JSON body", [{body: err.message}]);
+                return sendProblemDetail(req, res, 400, "Invalid JSON body", [{body: err.message}] as ProblemDetailErrors<object>);
             }
 
             case err instanceof UnathorizedError: {
@@ -55,7 +47,7 @@ export function createErrorHandler(config: Config) {
 
             case err instanceof mongoose.Error.ValidationError: {
                 const errors = Object.values(err.errors).map(e => ({[e.path]: e.message}));
-                return sendProblemDetail(req, res, 422, "Validation Error", errors);
+                return sendProblemDetail(req, res, 422, "Validation Error", errors as ProblemDetailErrors<object>);
             }
 
             case err instanceof mongoose.Error.CastError: {
@@ -65,7 +57,7 @@ export function createErrorHandler(config: Config) {
             case err instanceof MongoServerError && err.code === 11000: {
                 const field = Object.keys(err.keyValue as object)[0] ?? 'unknown';
                 const errors = [{[field]: "Duplicate value"}];
-                return sendProblemDetail(req, res, 409, "Duplicate value", errors);
+                return sendProblemDetail(req, res, 409, "Duplicate value", errors as ProblemDetailErrors<object>);
             }
 
             case err instanceof jwt.TokenExpiredError: {

@@ -1,8 +1,8 @@
 import StationRepository from "backend/dal/repositories/StationRepository";
-import Station, {Status} from "backend/dal/entities/Station";
+import Station, {Status} from "common/entities/Station";
 import {MongoCrudRepository} from "backend/dal/repositories/MongoCrudRepository";
 import StationModel, {StationDocument} from "backend/dal/schemas/StationSchema";
-import {PaginationResult} from "backend/dal/repositories/Results";
+import {PaginationResult} from "common/Results";
 
 export default class StationRepositoryImpl extends MongoCrudRepository<StationDocument> implements StationRepository {
 
@@ -37,20 +37,34 @@ export default class StationRepositoryImpl extends MongoCrudRepository<StationDo
     }
 
     async getStationsPaginated(
-        filter: { city?: string; status?: Status } = {},
+        filter: Partial<Station> = {},
         options: { page?: number; limit?: number; sort?: Record<string, 1 | -1> } = {}
     ): Promise<PaginationResult<Station[]>> {
         const page = options.page ?? 1;
         const limit = options.limit ?? 50;
-        const sort = options.sort ?? { city_name: 1, station_name: 1 };
 
-        const query: Partial<Station> = {};
-        if (filter.city) query.city_name = filter.city
-        if (filter.status) query.status = filter.status;
+        const { geolocation, measured_parameters, ...rest } = filter;
+
+        const fuzzyFilter: Record<string, unknown> = Object.fromEntries(
+            Object.entries(rest).map(([key, value]) => {
+                if (typeof value === "string") {
+                    return [key, { $regex: value, $options: "i" }]
+                }
+                return [key, value]
+            })
+        ) as Record<string, unknown>;
+
+        if (measured_parameters && measured_parameters.length > 0) {
+            fuzzyFilter.measured_parameters = { $in: measured_parameters }
+        }
+
+        if (geolocation?.coordinates.length === 2) {
+            fuzzyFilter.geolocation = geolocation
+        }
 
         const [data, total] =  await Promise.all([
-            this.model.find(filter)
-                .sort(sort)
+            this.model.find(fuzzyFilter)
+                .sort(options.sort)
                 .skip((page - 1) * limit)
                 .limit(limit)
                 .exec(),

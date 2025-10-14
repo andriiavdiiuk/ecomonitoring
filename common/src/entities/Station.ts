@@ -1,11 +1,10 @@
-import {MeasuredParameters} from "backend/dal/entities/Pollutant";
+import {MeasuredParameters} from "common/entities/Pollutant";
 
 export enum Status {
     Active = 'active',
     Inactive = 'inactive',
     Maintenance = 'maintenance',
 }
-
 
 export default interface Station{
     station_id: string,
@@ -15,7 +14,7 @@ export default interface Station{
     timezone: string,
     geolocation: {
         type: string,
-        coordinates: number[],
+        coordinates: [number, number],
     },
     platform_name: string,
     status: Status,

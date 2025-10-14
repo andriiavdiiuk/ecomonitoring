@@ -35,7 +35,7 @@ export function createDefaultConfig(): Config {
         },
         cors: {
             origins: requireEnv("ALLOWED_ORIGINS").split(",").map(origin => origin.trim()),
-            methods: ["GET", "PATCH", "POST", "DELETE"],
+            methods: ["GET", "PATCH", "POST", "DELETE","OPTIONS"],
             credentials: true,
         },
         argon2: {

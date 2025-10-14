@@ -1,8 +1,8 @@
 import SaveEcoBotService, {SyncEcoBotResult} from "backend/bll/services/SaveEcoBotService";
-import Station from "backend/dal/entities/Station";
-import {AveragingPeriod, MeasuredParameters, Pollutant, QualityFlag, Unit} from "backend/dal/entities/Pollutant";
+import Station from "common/entities/Station";
+import {AveragingPeriod, MeasuredParameters, Pollutant, Unit, QualityFlag} from "common/entities/Pollutant";
 import StationRepository from "backend/dal/repositories/StationRepository";
-import {Measurement} from "backend/dal/entities/Measurement";
+import {Measurement} from "common/entities/Measurement";
 import MeasurementRepository from "backend/dal/repositories/MeasurementRepository";
 
 type SaveEcoBotPollutant = {

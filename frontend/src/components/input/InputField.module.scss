@@ -1,0 +1,21 @@
+@use 'frontend/variables';
+@use 'frontend/mixins';
+@use "./input";
+.field {
+  @include input.field
+}
+
+
+.checkbox_field {
+  flex-direction: row;
+  align-items: center;
+
+  .label {
+    margin: 0 0.5rem 0 0;
+  }
+}
+
+.success {
+  color: variables.$success-color;
+  text-align: center;
+}

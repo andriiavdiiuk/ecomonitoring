@@ -1,6 +1,5 @@
-import {User} from "backend/dal/entities/User";
+import {User} from "common/entities/User";
 import jwt, {JwtPayload} from "jsonwebtoken";
-import config from "backend/api/configuration/config";
 import Config from "backend/api/configuration/config";
 
 

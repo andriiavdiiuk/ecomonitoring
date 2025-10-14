@@ -1,0 +1,49 @@
+@use "variables";
+
+@mixin input-style {
+  padding: 0.6rem 0.8rem;
+  border-radius: variables.$border-radius;
+  border: 1px solid variables.$input-border;
+  background-color: white;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: variables.$primary-color;
+    box-shadow: 0 0 6px rgba(46, 125, 50, 0.4);
+  }
+}
+
+@mixin button-style {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: variables.$border-radius;
+  border: none;
+  background-color: variables.$primary-color;
+  color: white;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: background-color 0.25s ease, transform 0.15s ease;
+
+  &:hover {
+    background-color: darken(variables.$primary-color, 8%);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    background-color: lighten(variables.$primary-color, 25%);
+    cursor: not-allowed;
+  }
+}
+
+@mixin grid-center-style {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  background-color: variables.$background-color;
+}

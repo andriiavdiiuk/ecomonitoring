@@ -2,7 +2,7 @@ import {NextFunction, Request, Response} from "express";
 import {JwtPayload} from "jsonwebtoken";
 import {sendProblemDetail} from "backend/api/middleware/errorHandler";
 import JwtUtils from "backend/api/security/JwtUtils";
-import {Roles} from "backend/dal/entities/Roles";
+import Roles from "common/entities/Roles";
 
 export interface AuthenticatedRequest extends Request {
     user?: JwtPayload;

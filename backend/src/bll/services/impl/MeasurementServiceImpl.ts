@@ -1,12 +1,12 @@
-import {PaginationResult} from "backend/dal/repositories/Results";
-import MeasurementService, { ThresholdExceedance, Severity} from "backend/bll/services/MeasurementService";
-import {Measurement} from "backend/dal/entities/Measurement";
-import {MeasuredParameters} from "backend/dal/entities/Pollutant";
-import MeasurementRepository, {MeasurementStats} from "backend/dal/repositories/MeasurementRepository";
+import {MeasurementStats, PaginationResult, Severity, ThresholdExceedance} from "common/Results";
+import MeasurementService from "backend/bll/services/MeasurementService";
+import {Measurement} from "common/entities/Measurement";
+import {MeasuredParameters} from "common/entities/Pollutant";
+import MeasurementRepository from "backend/dal/repositories/MeasurementRepository";
 import {
     GetMeasurementDTO,
     MeasurementFilterDTO,
-} from "backend/bll/validation/schemas/measurementSchemas";
+} from "common/validation/schemas/measurementSchemas";
 
 export class MeasurementServiceImpl implements MeasurementService {
     private readonly measurementRepository: MeasurementRepository
@@ -39,7 +39,7 @@ export class MeasurementServiceImpl implements MeasurementService {
     }
 
     public async updateMeasurement(measurement: Measurement): Promise<Measurement | null> {
-        return await this.measurementRepository.update(measurement.id, measurement);
+        return await this.measurementRepository.update(measurement._id, measurement);
     }
 
     public async deleteMeasurement(id: string): Promise<boolean> {

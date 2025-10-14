@@ -1,7 +1,7 @@
 import express, {Request, Response, Router} from "express";
 
 import {authMiddleware} from "backend/api/middleware/authMiddleware";
-import {Roles} from "backend/dal/entities/Roles";
+import Roles from "common/entities/Roles";
 import {RequestSource, validationMiddleware} from "backend/api/middleware/validationMiddleware";
 import {
     GetStationsQuerySchema,
@@ -9,7 +9,7 @@ import {
     StationIdParamsSchema,
     StationSchema,
     UpdateStationSchema
-} from "backend/bll/validation/schemas/stationSchemas";
+} from "common/validation/schemas/stationSchemas";
 import MeasurementController from "backend/api/controllers/MeasurementController";
 import {MeasurementServiceImpl} from "backend/bll/services/impl/MeasurementServiceImpl";
 import {MeasurementRepositoryImpl} from "backend/dal/repositories/impl/MeasurementRepositoryImpl";
@@ -17,11 +17,10 @@ import {
     GetMeasurementsSchema, MeasurementDTO, MeasurementFilterSchema,
     MeasurementIdParamsSchema,
     MeasurementSchema, UpdateMeasurementSchema
-} from "backend/bll/validation/schemas/measurementSchemas";
-import {Measurement} from "backend/dal/entities/Measurement";
+} from "common/validation/schemas/measurementSchemas";
+import {Measurement} from "common/entities/Measurement";
 import Config from "backend/api/configuration/config";
 import JwtUtils from "backend/api/security/JwtUtils";
-import jwt from "jsonwebtoken";
 
 
 export default function createMeasurementRoutes(config: Config): Router {
@@ -77,7 +76,7 @@ export default function createMeasurementRoutes(config: Config): Router {
         async (req: Request, res: Response): Promise<Response> => {
             const {id} = MeasurementIdParamsSchema.parse(req.params);
             const dto: Measurement = UpdateMeasurementSchema.parse(req.body) as Measurement;
-            dto.id = id;
+            dto._id = id;
             return await measurementController.updateMeasurement(req, res, dto);
         }
     );

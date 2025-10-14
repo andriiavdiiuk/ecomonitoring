@@ -1,12 +1,10 @@
-import {Measurement} from "backend/dal/entities/Measurement";
-import MeasurementRepository, {
-    MeasurementStats,
-} from "backend/dal/repositories/MeasurementRepository";
-import {MeasuredParameters, Pollutant} from "backend/dal/entities/Pollutant";
+import {Measurement} from "common/entities/Measurement";
+import MeasurementRepository from "backend/dal/repositories/MeasurementRepository";
+import {MeasuredParameters, Pollutant} from "common/entities/Pollutant";
 import {MongoCrudRepository} from "backend/dal/repositories/MongoCrudRepository";
 import MeasurementModel, {MeasurementDocument} from "backend/dal/schemas/MeasurementSchema";
 import mongoose from "mongoose";
-import {PaginationResult} from "backend/dal/repositories/Results";
+import {MeasurementStats, PaginationResult} from "common/Results";
 
 export class MeasurementRepositoryImpl extends MongoCrudRepository<MeasurementDocument> implements MeasurementRepository {
     constructor() {
@@ -60,33 +58,56 @@ export class MeasurementRepositoryImpl extends MongoCrudRepository<MeasurementDo
         const page = options.page ?? 1;
         const limit = options.limit ?? 50;
 
-        const query: mongoose.FilterQuery<Measurement> = {};
+        const match: mongoose.FilterQuery<Measurement> = {};
 
-        if (filter.station_id) query.station_id = filter.station_id;
-        if (filter.pollutant) query["pollutants.pollutant"] = filter.pollutant;
+        if (filter.station_id) match.station_id = filter.station_id;
         if (filter.start_date || filter.end_date) {
-            query.measurement_time = {};
-            if (filter.start_date) query.measurement_time.$gte = filter.start_date;
-            if (filter.end_date) query.measurement_time.$lte = filter.end_date;
+            match.measurement_time = {};
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            if (filter.start_date) match.measurement_time.$gte = filter.start_date;
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            if (filter.end_date) match.measurement_time.$lte = filter.end_date;
         }
+
+        const pipeline: mongoose.PipelineStage[] = [{ $match: match }];
+
+        if (filter.pollutant) {
+            pipeline.push({
+                $project: {
+                    station_id: 1,
+                    measurement_time: 1,
+                    pollutants: {
+                        $filter: {
+                            input: "$pollutants",
+                            as: "item",
+                            cond: { $eq: ["$$item.pollutant", filter.pollutant] }
+                        }
+                    }
+                }
+            } as mongoose.PipelineStage.Project);
+        }
+
+        pipeline.push(
+            { $skip: (page - 1) * limit },
+            { $limit: limit }
+        );
+
         const [data, total] = await Promise.all([
-            this.model.find(query)
-                .skip((page - 1) * limit)
-                .limit(limit)
-                .exec(),
-            this.count(query)
+            this.model.aggregate<Measurement>(pipeline).exec(),
+            this.model.countDocuments(match)
         ]);
 
         return {
-            data: data,
+            data,
             pagination: {
                 page,
-                limit,
                 total,
-                pages: Math.ceil(total / limit),
+                limit,
+                pages: Math.ceil(total / limit)
             }
-        }
+        };
     }
+
 
     public async getLatest(): Promise<Measurement[]> {
         return await this.model.aggregate([

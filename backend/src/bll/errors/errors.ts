@@ -1,14 +1,16 @@
-export class ValidationError extends Error {
-    public fieldErrors: Array<Partial<Record<string, string | object>>> = []
+import {ProblemDetailErrors} from "common/Results";
 
-    constructor(message: string, fieldErrors: Array<Partial<Record<string, string | object>>> = []) {
+export class ValidationError extends Error {
+    public fieldErrors: ProblemDetailErrors<unknown> = []
+
+    constructor(message: string, fieldErrors: ProblemDetailErrors<unknown> = []) {
         super(message)
         this.fieldErrors = fieldErrors
     }
 }
 
 export class UnathorizedError extends ValidationError {
-    constructor(message: string, fieldErrors: Array<Partial<Record<string, string | object>>> = []) {
+    constructor(message: string, fieldErrors: ProblemDetailErrors<unknown> = []) {
         super(message, fieldErrors);
     }
 };

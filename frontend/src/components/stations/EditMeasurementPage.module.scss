@@ -1,0 +1,36 @@
+@use 'frontend/mixins';
+@use 'frontend/variables';
+
+.container {
+  margin: 50px;
+
+  .button_danger,
+  button {
+    @include mixins.button-style;
+  }
+
+
+  .button_danger {
+    background-color: variables.$error-color;
+
+
+    &:hover {
+      background-color: darken(variables.$error-color, 10%);
+    }
+  }
+  .error {
+    color: variables.$error-color;
+    font-size: 0.875rem;
+  }
+  .success {
+    color: variables.$success-color;
+    text-align: center;
+  }
+  .pollutant {
+    margin-bottom: 1.5em;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 1em;
+    position: relative;
+  }
+}
+

@@ -1,0 +1,9 @@
+@use "frontend/variables";
+
+.container {
+  margin: 50px;
+}
+.error {
+  color: variables.$error-color;
+  font-size: 0.875rem;
+}

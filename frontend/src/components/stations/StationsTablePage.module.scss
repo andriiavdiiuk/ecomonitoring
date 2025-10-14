@@ -1,0 +1,27 @@
+@use 'frontend/variables';
+@use 'frontend/mixins';
+.table {
+  margin: 50px;
+
+  button {
+    @include mixins.button-style;
+    margin-bottom: 20px;
+  }
+}
+.search {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+
+  select {
+    padding: 0.6rem 0.8rem;
+    border-radius: 8px;
+    border: 1px solid #CFD8DC;
+    background-color: white;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .input {
+    flex-grow: 1;
+  }
+}

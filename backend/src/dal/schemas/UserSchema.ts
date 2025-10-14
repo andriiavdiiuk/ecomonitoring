@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
-import { User } from "backend/dal/entities/User";
-import { Roles } from "backend/dal/entities/Roles";
+import {User} from "common/entities/User";
+import Roles from "common/entities/Roles";
 
 export interface UserDocument extends User, Document {}
 
