@@ -8,10 +8,11 @@
     "backend:run": "npm --prefix backend run run",
     "frontend:dev": "npm --prefix frontend run dev",
     "frontend:build": "npm --prefix frontend run build",
+    "frontend:run": "npm --prefix frontend run preview",
     "common:build": "npm --prefix common run build",
     "dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\"",
     "build": "npm run common:build && npm run backend:build && npm run frontend:build",
-    "run": "concurrently \"npm run backend:run\" \"npm run frontend:dev\""
+    "run": "concurrently \"npm run backend:run\" \"npm run frontend:run\""
   },
   "private": true,
   "workspaces": {
