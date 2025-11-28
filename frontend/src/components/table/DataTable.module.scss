@@ -26,7 +26,7 @@
     font-weight: bold;
   }
 
-  tbody tr:nth-child(even) {
+  tbody tr.row:nth-child(even){
     background-color: rgba(
                     red(variables.$secondary-color),
                     green(variables.$secondary-color),

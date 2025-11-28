@@ -2,7 +2,7 @@ import {generatePath, useParams} from "react-router";
 import React, {type JSX, useEffect, useState} from "react";
 import stationService from "frontend/services/StationService.ts";
 import measurementService from "frontend/services/MeasurementService.ts";
-import DataTable from "frontend/components/table/DataTable.tsx";
+import DataTable, {type TableRowData} from "frontend/components/table/DataTable.tsx";
 import styles from './StationPage.module.scss';
 import Pagination from "frontend/components/table/Pagination.tsx";
 import SelectField from "frontend/components/input/SelectField.tsx";
@@ -25,7 +25,8 @@ export default function StationPage(): JSX.Element {
     const {id} = useParams<{ id: string }>() as { id: string };
     const [station, setStation] = useState<Station | null>(null);
     const [measurements, setMeasurements] = useState<PaginationResult<Measurement[]>>();
-    const [tableData, setTableData] = useState<(string | JSX.Element)[][]>([]);
+    const [expandedPollutants, setExpandedPollutants] = useState<Set<string>>();
+    const [tableData, setTableData] = useState<TableRowData[]>([]);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [search, setSearch] = useState<Search>({pollutant: '', start_date: '', end_date: ''});
     const userContext = useUser();
@@ -54,10 +55,11 @@ export default function StationPage(): JSX.Element {
             measurementService.getMeasurements({station_id: id, page: currentPage, limit: 20, ...params})
                 .then((res) => {
                     setMeasurements(res);
-                    const mapped: (string | JSX.Element)[][] = [];
+                    const mapped: TableRowData[] = [];
                     res.data.forEach((m: Measurement) => {
                         m.pollutants.forEach((p) => {
                             let edit: string | JSX.Element = '';
+
                             if (userContext.user?.isRole('admin')) {
                                 const path = generatePath(AppRoutes.EditMeasurement, {
                                     station_id: id,
@@ -66,13 +68,16 @@ export default function StationPage(): JSX.Element {
 
                                 edit = <Link to={path}>Edit</Link>;
                             }
-
-                            mapped.push([
-                                new Date(m.measurement_time).toLocaleString(),
-                                p.pollutant,
-                                `${String(p.value)} ${p.unit}`,
-                                ...(edit ? [edit] : [])
-                            ]);
+                            const rowId = `${m._id},${p.pollutant}`;
+                            mapped.push({
+                                row: [
+                                    new Date(m.measurement_time).toLocaleString(),
+                                    p.pollutant,
+                                    `${String(p.value)} ${p.unit}`,
+                                    ...(edit ? [edit] : []),
+                                ],
+                                rowId: rowId
+                            });
                         });
                     });
 
@@ -82,13 +87,45 @@ export default function StationPage(): JSX.Element {
                     console.error(err);
                     setTableData([]);
                 });
-
-
         }, 500);
         return () => {
             clearTimeout(handler)
         };
-    }, [id, currentPage, search]);
+    }, [id, currentPage, search, userContext.user]);
+
+    useEffect(() => {
+        if (!expandedPollutants || !measurements) return;
+
+        setTableData(prev =>
+            prev.map(rowData => {
+                const rowId = rowData.rowId;
+                if (rowId && expandedPollutants.has(rowId)) {
+                    const [measurementId, pollutantName] = rowId.split(',');
+                    const measurement = measurements.data.find(m => m._id === measurementId);
+                    if (!measurement) return { ...rowData, afterRow: undefined };
+                    const pollutant = measurement.pollutants.find(p => p.pollutant.toString() === pollutantName && p.health_risk);
+                    if (!pollutant) return { ...rowData, afterRow: undefined };
+                    const formatValue = (num?: number) => {
+                        if (num === undefined) return '';
+                        return Number(num.toPrecision(3)).toString();
+                    }
+
+                    return {
+                        ...rowData,
+                        afterRow: (
+                            <>
+                                <p>Hazard Index (HI): {formatValue(pollutant.health_risk?.HI)}</p>
+                                <p>Chronic Daily Intake (CDI): {formatValue(pollutant.health_risk?.CDI)}</p>
+                            </>
+                        )
+                    };
+                }
+                return { ...rowData, afterRow: undefined };
+            })
+
+        );
+    }, [expandedPollutants, measurements]);
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
 
@@ -120,6 +157,19 @@ export default function StationPage(): JSX.Element {
     const onPageChange = (page: number): void => {
         setCurrentPage(page);
     };
+
+    const handleRowClick = (_row: (string | JSX.Element)[],_index: number, id: string | null): void => {
+        if (!id) return;
+        setExpandedPollutants(prev => {
+            const next = new Set(prev ?? []);
+            if (next.has(id)) {
+                next.delete(id);
+            } else {
+                next.add(id);
+            }
+            return next;
+        });
+    }
 
     if (!station) return <p>Loading station...</p>;
 
@@ -200,7 +250,9 @@ export default function StationPage(): JSX.Element {
                 <DataTable
                     data={tableData}
                     header={header}
+                    handleRowClick={handleRowClick}
                 />
+
                 <Pagination
                     currentPage={measurements?.pagination.page || 0}
                     totalPages={measurements?.pagination.pages || 0}

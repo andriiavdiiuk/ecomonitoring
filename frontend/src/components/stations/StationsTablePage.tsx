@@ -1,4 +1,4 @@
-import DataTable from "frontend/components/table/DataTable.tsx";
+import DataTable, {type TableRowData} from "frontend/components/table/DataTable.tsx";
 import stationService from "frontend/services/StationService.ts";
 import {type JSX, useEffect, useState} from "react";
 import styles from "./StationsTablePage.module.scss";
@@ -13,7 +13,7 @@ import {Status} from "common/entities/Station.ts";
 
 export default function StationsTablePage() {
     const [stations, setStations] = useState<PaginationResult<Station[]>>();
-    const [tableData, setTableData] = useState<(string)[][]>([]);
+    const [tableData, setTableData] = useState<TableRowData[]>([]);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [search, setSearch] = useState<Partial<Station>>();
     const [showFilters, setShowFilters] = useState<boolean>(false);
@@ -24,12 +24,17 @@ export default function StationsTablePage() {
             stationService.getStations({page: currentPage, limit: 20, ...search})
                 .then(res => {
                     setStations(res);
-                    const mapped = res.data.map(station => [
-                        station.station_id,
-                        station.city_name,
-                        station.station_name,
-                        station.platform_name,
-                    ]);
+                    const mapped: TableRowData[] = res.data.map((station) => {
+                            return {
+                                row: [
+                                    station.station_id,
+                                    station.city_name,
+                                    station.station_name,
+                                    station.platform_name,
+                                ]
+                            }
+                        }
+                    );
                     setTableData(mapped);
                 })
                 .catch((err: unknown) => {
