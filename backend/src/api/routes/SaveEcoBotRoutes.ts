@@ -13,7 +13,7 @@ import JwtUtils from "backend/api/security/JwtUtils";
 export default function createSaveEcoBotRoutes(config: Config): Router {
     const saveEcoBotRoutes = express.Router();
     const measurementRepository = new MeasurementRepositoryImpl();
-    const stationRepository = new StationRepositoryImpl()
+    const stationRepository = new StationRepositoryImpl();
     const saveEcoBotService = new SaveEcoBotServiceImpl(stationRepository, measurementRepository);
     const saveEcoBotController = new SaveEcoBotController(saveEcoBotService);
     const jwtUtils = new JwtUtils(config);

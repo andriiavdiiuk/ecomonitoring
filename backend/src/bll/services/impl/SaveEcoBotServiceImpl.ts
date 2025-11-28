@@ -4,6 +4,7 @@ import {AveragingPeriod, MeasuredParameters, Pollutant, Unit, QualityFlag} from 
 import StationRepository from "backend/dal/repositories/StationRepository";
 import {Measurement} from "common/entities/Measurement";
 import MeasurementRepository from "backend/dal/repositories/MeasurementRepository";
+import {calculateRisk} from "common/health_risk/HealthRiskCalculator";
 
 type SaveEcoBotPollutant = {
     pol: MeasuredParameters;
@@ -30,10 +31,9 @@ export default class SaveEcoBotServiceImpl implements SaveEcoBotService {
     private readonly apiUrl: string = 'https://api.saveecobot.com/output.json';
     private readonly stationRepository: StationRepository;
     private readonly measurementRepository: MeasurementRepository;
-
     constructor(stationRepository: StationRepository, measurementRepository: MeasurementRepository) {
-        this.stationRepository = stationRepository
-        this.measurementRepository = measurementRepository
+        this.stationRepository = stationRepository;
+        this.measurementRepository = measurementRepository;
     }
 
     public async sync(): Promise<SyncEcoBotResult> {
@@ -76,7 +76,6 @@ export default class SaveEcoBotServiceImpl implements SaveEcoBotService {
                     await this.stationRepository.updateBy({station_id: <string>stationInfo.station_id}, stationInfo);
                     results.stations_updated++;
                 }
-
                 const measurementGroups: Record<string, Partial<Measurement>> = {};
                 stationData.pollutants.forEach((p: SaveEcoBotPollutant) => {
                     if (p.time && p.value != null) {
@@ -90,7 +89,8 @@ export default class SaveEcoBotServiceImpl implements SaveEcoBotService {
                             value: p.value,
                             unit: p.unit,
                             averaging_period: p.averaging,
-                            quality_flag: QualityFlag.Valid
+                            quality_flag: QualityFlag.Valid,
+                            // health_risk: this.healthRiskCalculator.calculateRisk()
                         });
                     }
                 });
@@ -112,6 +112,10 @@ export default class SaveEcoBotServiceImpl implements SaveEcoBotService {
                                 import_time: new Date()
                             }
                         };
+                        measurement.pollutants?.forEach((pollutant) => {
+                            pollutant.health_risk = calculateRisk(pollutant,measurement.pollutants as Pollutant[]) ?? undefined;
+                        })
+
                         await this.measurementRepository.create(measurement);
                         results.measurements_created++;
                     }

@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import {AveragingPeriod, MeasuredParameters, Pollutant, QualityFlag, Unit} from "common/entities/Pollutant";
+import {HealthRiskSchema} from "backend/dal/schemas/HealthRiskSchema";
 
 export interface PollutantDocument extends Pollutant, Document {}
 
@@ -28,6 +29,7 @@ export const PollutantSchema = new mongoose.Schema<PollutantDocument>(
             default: QualityFlag.Preliminary,
             enum: Object.values(QualityFlag),
         },
+        health_risk: HealthRiskSchema,
     },
     { _id: false }
 );

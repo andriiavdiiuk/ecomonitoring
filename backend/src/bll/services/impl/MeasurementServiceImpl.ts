@@ -7,6 +7,8 @@ import {
     GetMeasurementDTO,
     MeasurementFilterDTO,
 } from "common/validation/schemas/measurementSchemas";
+import {calculateRisk} from "common/health_risk/HealthRiskCalculator";
+import {HealthRisk} from "common/entities/HealthRisk";
 
 export class MeasurementServiceImpl implements MeasurementService {
     private readonly measurementRepository: MeasurementRepository
@@ -35,10 +37,17 @@ export class MeasurementServiceImpl implements MeasurementService {
     }
 
     public async createMeasurement(measurement: Measurement): Promise<Measurement> {
+
+        measurement.pollutants.forEach((pollutant) => {
+            pollutant.health_risk = calculateRisk(pollutant, measurement.pollutants) as HealthRisk | undefined;
+        })
         return await this.measurementRepository.create(measurement);
     }
 
     public async updateMeasurement(measurement: Measurement): Promise<Measurement | null> {
+        measurement.pollutants.forEach((pollutant) => {
+            pollutant.health_risk = calculateRisk(pollutant, measurement.pollutants) as HealthRisk | undefined;
+        })
         return await this.measurementRepository.update(measurement._id, measurement);
     }
 

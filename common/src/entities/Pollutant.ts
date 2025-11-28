@@ -1,3 +1,5 @@
+import {HealthRisk} from "common/entities/HealthRisk";
+
 export enum MeasuredParameters {
     PM25 = 'PM2.5',
     PM10 = 'PM10',
@@ -43,4 +45,5 @@ export interface Pollutant {
     unit: Unit
     averaging_period?: AveragingPeriod;
     quality_flag?: QualityFlag;
+    health_risk?: HealthRisk;
 }
