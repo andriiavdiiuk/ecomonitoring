@@ -14,6 +14,7 @@ import type Station from "common/entities/Station.ts";
 import type {Measurement} from "common/entities/Measurement.ts";
 import {MeasuredParameters} from "common/entities/Pollutant.ts";
 import type {PaginationResult} from "common/Results.ts";
+import HealthRiskLevels from "frontend/components/health_risk/HealthRiskLevels.tsx";
 
 interface Search {
     pollutant: string,
@@ -102,29 +103,22 @@ export default function StationPage(): JSX.Element {
                 if (rowId && expandedPollutants.has(rowId)) {
                     const [measurementId, pollutantName] = rowId.split(',');
                     const measurement = measurements.data.find(m => m._id === measurementId);
-                    if (!measurement) return { ...rowData, afterRow: undefined };
+                    if (!measurement) return {...rowData, afterRow: undefined};
                     const pollutant = measurement.pollutants.find(p => p.pollutant.toString() === pollutantName && p.health_risk);
-                    if (!pollutant) return { ...rowData, afterRow: undefined };
-                    const formatValue = (num?: number) => {
-                        if (num === undefined) return '';
-                        return Number(num.toPrecision(3)).toString();
-                    }
+                    if (!pollutant) return {...rowData, afterRow: undefined};
 
                     return {
                         ...rowData,
                         afterRow: (
-                            <>
-                                <p>Hazard Index (HI): {formatValue(pollutant.health_risk?.HI)}</p>
-                                <p>Chronic Daily Intake (CDI): {formatValue(pollutant.health_risk?.CDI)}</p>
-                            </>
+                            <HealthRiskLevels risk={pollutant.health_risk}/>
                         )
                     };
                 }
-                return { ...rowData, afterRow: undefined };
+                return {...rowData, afterRow: undefined};
             })
-
         );
     }, [expandedPollutants, measurements]);
+
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -158,7 +152,7 @@ export default function StationPage(): JSX.Element {
         setCurrentPage(page);
     };
 
-    const handleRowClick = (_row: (string | JSX.Element)[],_index: number, id: string | null): void => {
+    const handleRowClick = (_row: (string | JSX.Element)[], _index: number, id: string | null): void => {
         if (!id) return;
         setExpandedPollutants(prev => {
             const next = new Set(prev ?? []);

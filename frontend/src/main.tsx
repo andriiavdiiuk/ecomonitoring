@@ -15,6 +15,7 @@ import StationPage from "frontend/components/stations/StationPage.tsx";
 import EditStationPage from "frontend/components/stations/EditStationPage.tsx";
 import EditMeasurementPage from "frontend/components/stations/EditMeasurementPage.tsx";
 import RequireAuth from "frontend/components/miscellaneous/RequireAuth.tsx";
+import HealthRiskCalculatorPage from "frontend/components/health_risk/HealthRiskCalculatorPage.tsx";
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
@@ -48,6 +49,7 @@ createRoot(document.getElementById('root')!).render(
                             <EditMeasurementPage/>
                         </RequireAuth>
                     }/>
+                    <Route path={AppRoutes.HealthRiskCalculator} element={<HealthRiskCalculatorPage />} />
                 </Routes>
             </BrowserRouter>
         </UserProvider>

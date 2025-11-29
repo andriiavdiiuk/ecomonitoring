@@ -1,0 +1,31 @@
+.hq,
+.cr {
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.none,
+.level_minimal,
+.level_acceptable {
+  background: #c8e6c9;
+  color: #1b5e20;
+}
+
+.level_medium,
+.level_borderline {
+  background: #ffe0b2;
+  color: #e65100;
+}
+
+.level_high,
+.level_unacceptable {
+  background: #ffcdd2;
+  color: #b71c1c;
+}
+
+.level_low {
+  background: #dcedc8;
+  color: #4e6e34;
+}
+

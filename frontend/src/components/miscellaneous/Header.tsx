@@ -13,6 +13,7 @@ export default function Header(): JSX.Element {
                 <nav className={styles.nav}>
                     <Link to={AppRoutes.Home}>Home</Link>
                     <Link to={AppRoutes.Stations}>Stations</Link>
+                    <Link to={AppRoutes.HealthRiskCalculator}>Calculator</Link>
                     <div className={styles.spacer}/>
                     {!loggedIn &&
                         <>

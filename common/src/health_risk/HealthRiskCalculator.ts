@@ -20,7 +20,7 @@ function calculateRisk(
     if (!relevantPollutants.includes(pollutant.pollutant)) return null;
 
     const IR = options?.IR ?? 15;
-    const EF = options?.EF ?? 365 / 365;
+    const EF = options?.EF ?? 365;
     const ED = options?.ED ?? 1;
     const BW = options?.BW ?? 70;
     let AT_HQ = EF * ED;
