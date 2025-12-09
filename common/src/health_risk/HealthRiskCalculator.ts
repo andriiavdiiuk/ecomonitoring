@@ -1,6 +1,6 @@
-import {MeasuredParameters, Pollutant, Unit} from "common/entities/Pollutant";
-import {HealthRisk} from "common/entities/HealthRisk";
-import {HealthRiskOptionsDto} from "common/validation/schemas/HealthRiskSchemas";
+import {MeasuredParameters, type Pollutant, Unit} from "common/entities/Pollutant";
+import {type HealthRisk} from "common/entities/HealthRisk";
+import {type HealthRiskOptionsDto} from "common/validation/schemas/HealthRiskSchemas";
 
 const relevantPollutants = [
     MeasuredParameters.PM25,

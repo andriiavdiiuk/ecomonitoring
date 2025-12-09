@@ -1,4 +1,4 @@
-import {HealthRisk} from "common/entities/HealthRisk";
+import {type HealthRisk} from "common/entities/HealthRisk";
 
 export enum MeasuredParameters {
     PM25 = 'PM2.5',
