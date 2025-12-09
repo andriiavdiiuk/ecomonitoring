@@ -7,10 +7,23 @@ export enum MeasuredParameters {
     Humidity = 'Humidity',
     Pressure = 'Pressure',
     AirQualityIndex = 'Air Quality Index',
+    NO = 'NO',
     NO2 = 'NO2',
     SO2 = 'SO2',
     CO = 'CO',
+    CO2 = 'CO2',
     O3 = 'O3',
+    NH3 = 'NH3',
+    BenzoAPyrene = 'C20H12',
+    Cd = 'Cd',
+    CuO = 'CuO',
+    As = 'As',
+    NiO = 'NiO',
+    Hg = 'Hg',
+    SeO2 = 'SeO2',
+    Pb = 'Pb',
+    CrVI = 'Cr(VI)',
+    ZnO = 'ZnO',
 }
 
 export enum Unit {

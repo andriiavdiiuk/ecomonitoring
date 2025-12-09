@@ -7,63 +7,107 @@ const relevantPollutants = [
     MeasuredParameters.PM10,
     MeasuredParameters.NO2,
     MeasuredParameters.SO2,
+    MeasuredParameters.O3,
+    MeasuredParameters.NO,
     MeasuredParameters.CO,
-    MeasuredParameters.O3
+    MeasuredParameters.CO2,
+    MeasuredParameters.NH3,
+    MeasuredParameters.BenzoAPyrene,
+    MeasuredParameters.Cd,
+    MeasuredParameters.CuO,
+    MeasuredParameters.As,
+    MeasuredParameters.NiO,
+    MeasuredParameters.Hg,
+    MeasuredParameters.SeO2,
+    MeasuredParameters.Pb,
+    MeasuredParameters.CrVI,
+    MeasuredParameters.ZnO,
 ];
 
+function resolveAT(options?: HealthRiskOptionsDto, EF = 365, ED = 1) {
+    const defaultAT = EF * ED;
+
+    if (options?.AT && options.AT > 0) {
+        return { AT: options.AT };
+    }
+    return { AT: defaultAT };
+}
+
+function resolveExposureValues(options?: HealthRiskOptionsDto) {
+    return {
+        IR: options?.IR ?? 15,
+        EF: options?.EF ?? 365,
+        ED: options?.ED ?? 1,
+        BW: options?.BW ?? 70
+    };
+}
+
 function calculateRisk(
-    pollutant: Pollutant,
+    pollutant?: Partial<Pollutant>,
     allMeasurementPollutants?: Pollutant[],
     options?: HealthRiskOptionsDto
 ): HealthRisk | null {
+    const param = pollutant?.pollutant;
+    const { IR, EF, ED, BW } = resolveExposureValues(options);
+    const { AT } = resolveAT(options, EF, ED);
 
-    if (!relevantPollutants.includes(pollutant.pollutant)) return null;
+    let RFC = options?.RFC;
+    let SF = options?.SF ?? 0;
+    let C: number | undefined;
 
-    const IR = options?.IR ?? 15;
-    const EF = options?.EF ?? 365;
-    const ED = options?.ED ?? 1;
-    const BW = options?.BW ?? 70;
-    let AT_HQ = EF * ED;
-    let AT_CR = 70 * 365;
-    if (options?.AT) {
-        AT_HQ = options.AT;
-        AT_CR = options.AT;
+    if (!param) {
+
+        C = options?.C;
+        RFC = options?.RFC;
+        SF = options?.SF ?? 0;
+
+        if (C == null || RFC == null) {
+            return null;
+        }
+
+    } else {
+
+        if (!relevantPollutants.includes(param)) return null;
+
+        RFC = options?.RFC ?? RFC_VALUES[param] ?? 0;
+        SF = options?.SF ?? SF_VALUES[param] ?? 0;
+        if (!RFC) return null;
+
+        const molecularWeight = MOLECULAR_WEIGHTS[param];
+        const temperature = allMeasurementPollutants
+            ? getContextValue(allMeasurementPollutants, MeasuredParameters.Temperature)
+            : undefined;
+
+        C = options?.C ?? convertToMgPerM3(
+            pollutant?.value ?? 0,
+            pollutant?.unit ?? Unit.MgPerM3,
+            molecularWeight,
+            temperature
+        ) ?? undefined;
+        if (!C) return null;
     }
 
-    const RFC = options?.RFC ?? getRFC(pollutant.pollutant);
-    const SF = options?.SF ?? 0;
-    if (!RFC) return null;
+    const CDI = (C * IR * EF * ED) / (BW * AT);
 
-
-    const molecularWeight = getMolecularWeight(pollutant.pollutant);
-    const temperature = allMeasurementPollutants
-        ? getContextValue(allMeasurementPollutants, MeasuredParameters.Temperature)
-        : undefined;
-
-    const C = options?.C ?? convertToMgPerM3(pollutant.value, pollutant.unit, molecularWeight, temperature);
-    if (!C) return null;
-
-    const CDI_HQ = (C * IR * EF * ED) / (BW * AT_HQ);
-    const CDI_CR = (C * IR * EF * ED) / (BW * AT_CR);
     const HQ = C / RFC;
     const HI = HQ;
-    const CR = CDI_CR * SF;
+    const CR = CDI * SF;
 
     return {
         medium: "air",
         C,
         ED,
         BW,
-        AT: AT_HQ,
+        AT: AT,
         IR,
         EF,
         CR,
         SF,
         HI,
         HQ,
-        CDI: CDI_HQ,
+        CDI,
         RfC: RFC,
-        createdAt: new Date(),
+        createdAt: new Date()
     };
 }
 
@@ -82,43 +126,58 @@ function convertToMgPerM3(value: number, unit: Unit, molecularWeight?: number, t
     }
 }
 
-function getMolecularWeight(pollutant: MeasuredParameters): number | undefined {
-    switch (pollutant) {
-        case MeasuredParameters.NO2:
-            return 46;
-        case MeasuredParameters.SO2:
-            return 64;
-        case MeasuredParameters.CO:
-            return 28;
-        case MeasuredParameters.O3:
-            return 48;
-        default:
-            return undefined;
-    }
+const MOLECULAR_WEIGHTS: Record<string, number> = {
+    [MeasuredParameters.NO]: 30,
+    [MeasuredParameters.NO2]: 46,
+    [MeasuredParameters.SO2]: 64,
+    [MeasuredParameters.CO]: 28,
+    [MeasuredParameters.CO2]: 44,
+    [MeasuredParameters.O3]: 48,
+    [MeasuredParameters.NH3]: 17,
+    [MeasuredParameters.BenzoAPyrene]: 252,
+    [MeasuredParameters.Cd]: 112.41,
+    [MeasuredParameters.CuO]: 79.55,
+    [MeasuredParameters.As]: 74.92,
+    [MeasuredParameters.NiO]: 74.69,
+    [MeasuredParameters.Hg]: 200.59,
+    [MeasuredParameters.SeO2]: 110.96,
+    [MeasuredParameters.Pb]: 207.2,
+    [MeasuredParameters.CrVI]: 99.99,
+    [MeasuredParameters.ZnO]: 81.38,
 }
 
 function getContextValue(pollutants: Pollutant[], param: MeasuredParameters): number | undefined {
     const p = pollutants.find(p => p.pollutant === param);
     return p?.value;
 }
+const RFC_VALUES: Record<string, number> = {
+    [MeasuredParameters.PM10]: 0.15,
+    [MeasuredParameters.PM25]: 0.015,
+    [MeasuredParameters.NO]: 0.04,
+    [MeasuredParameters.NO2]: 0.04,
+    [MeasuredParameters.NH3]: 0.04,
+    [MeasuredParameters.SO2]: 0.005,
+    [MeasuredParameters.CO]: 3,
+    [MeasuredParameters.CO2]: 0,
+    [MeasuredParameters.O3]: 0.14,
+    [MeasuredParameters.BenzoAPyrene]: 0.000001,
+    [MeasuredParameters.Cd]: 0.0003,
+    [MeasuredParameters.CuO]: 0.002,
+    [MeasuredParameters.As]: 0.0003,
+    [MeasuredParameters.NiO]: 0.001,
+    [MeasuredParameters.Hg]: 0.0003,
+    [MeasuredParameters.SeO2]: 0.00005,
+    [MeasuredParameters.Pb]: 0.0003,
+    [MeasuredParameters.CrVI]: 0.0015,
+    [MeasuredParameters.ZnO]: 0.05
+};
 
-function getRFC(pollutant: MeasuredParameters): number | undefined {
-    switch (pollutant) {
-        case MeasuredParameters.PM10:
-            return 0.045;
-        case MeasuredParameters.PM25:
-            return 0.015;
-        case MeasuredParameters.NO2:
-            return 0.04;
-        case MeasuredParameters.SO2:
-            return 0.005;
-        case MeasuredParameters.CO:
-            return 3;
-        case MeasuredParameters.O3:
-            return 0.14;
-        default:
-            return undefined;
-    }
-}
-
-export  {getRFC, calculateRisk, convertToMgPerM3, getContextValue, getMolecularWeight }
+const SF_VALUES: Record<string, number> = {
+    [MeasuredParameters.BenzoAPyrene]: 3.1,
+    [MeasuredParameters.As]: 15,
+    [MeasuredParameters.NiO]: 0.91,
+    [MeasuredParameters.Cd]: 6.3,
+    [MeasuredParameters.Pb]: 0.042,
+    [MeasuredParameters.CrVI]: 42
+};
+export  {RFC_VALUES, SF_VALUES, calculateRisk, convertToMgPerM3, getContextValue, MOLECULAR_WEIGHTS }

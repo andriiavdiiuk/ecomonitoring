@@ -5,10 +5,11 @@ import {MeasuredParameters, type Pollutant, Unit} from "common/entities/Pollutan
 import type {HealthRisk} from "common/entities/HealthRisk.ts";
 import SelectField from "frontend/components/input/SelectField.tsx";
 import InputField from "frontend/components/input/InputField.tsx";
-import HealthRiskLevels from "frontend/components/health_risk/HealthRiskLevels.tsx";
+import HealthRiskLevel from "frontend/components/health_risk/HealthRiskLevel.tsx";
+import {getCDIlevel, getCRlevel, getHQlevel} from "frontend/components/health_risk/HealthRiskLevels.ts";
 
 export default function HealthRiskCalculatorPage(): JSX.Element {
-    const [measuredParameter, setMeasuredParameter] = useState<MeasuredParameters>(MeasuredParameters.NO2);
+    const [measuredParameter, setMeasuredParameter] = useState<MeasuredParameters | undefined>(undefined);
     const [C, setC] = useState<number>(0);
     const [IR, setIR] = useState<number>(15);
     const [EF, setEF] = useState<number>(365);
@@ -33,15 +34,18 @@ export default function HealthRiskCalculatorPage(): JSX.Element {
     });
 
     const handleCalculate = () => {
-        const pollutant: Pollutant = {
+        const pollutant: Partial<Pollutant> = {
             pollutant: measuredParameter,
             value: C,
             unit: Unit.MgPerM3,
         };
-        const risk = calculateRisk(pollutant, [], {IR, EF, ED, BW, AT, RFC, SF});
+        const options = measuredParameter
+            ? {C, IR, EF, ED, BW, AT}
+            : {C, IR, EF, ED, BW, AT, RFC, SF};
+        const risk = calculateRisk(pollutant, [], options);
         setResult(
             risk ?? {
-                medium: measuredParameter,
+                medium: measuredParameter ?? "",
                 C,
                 IR,
                 EF,
@@ -62,8 +66,21 @@ export default function HealthRiskCalculatorPage(): JSX.Element {
     const allowedPollutants = [
         MeasuredParameters.NO2,
         MeasuredParameters.SO2,
-        MeasuredParameters.CO,
         MeasuredParameters.O3,
+        MeasuredParameters.NO,
+        MeasuredParameters.CO,
+        MeasuredParameters.CO2,
+        MeasuredParameters.NH3,
+        MeasuredParameters.BenzoAPyrene,
+        MeasuredParameters.Cd,
+        MeasuredParameters.CuO,
+        MeasuredParameters.As,
+        MeasuredParameters.NiO,
+        MeasuredParameters.Hg,
+        MeasuredParameters.SeO2,
+        MeasuredParameters.Pb,
+        MeasuredParameters.CrVI,
+        MeasuredParameters.ZnO,
     ];
 
     return (
@@ -71,16 +88,23 @@ export default function HealthRiskCalculatorPage(): JSX.Element {
             <h2>Health Risk Calculator</h2>
 
             <div className={styles.grid}>
-                <SelectField label={"Pollutant"} value={measuredParameter} onChange={(e) => {
-                    setMeasuredParameter(e.target.value as MeasuredParameters)
-                }}>
+                <SelectField label={"Pollutant"} value={measuredParameter}
+                             onChange={(e) => {
+                                 const value = e.target.value;
+                                 if (value == "none") {
+                                     setMeasuredParameter(undefined);
+                                 } else {
+                                     setMeasuredParameter(e.target.value as MeasuredParameters)
+                                 }
+                             }}>
+                    <option value="none">None</option>
                     {allowedPollutants.map(p => (
                         <option key={p} value={p}>{p}</option>
                     ))}
                 </SelectField>
 
                 <InputField
-                    label="Concentration (C)"
+                    label="Concentration (C) mg/cm^3"
                     type="number"
                     value={C}
                     onChange={(e) => {
@@ -89,7 +113,7 @@ export default function HealthRiskCalculatorPage(): JSX.Element {
                 />
 
                 <InputField
-                    label="Inhalation rate (IR)"
+                    label="Inhalation rate (IR) volume/day"
                     type="number"
                     value={IR}
                     onChange={(e) => {
@@ -98,7 +122,7 @@ export default function HealthRiskCalculatorPage(): JSX.Element {
                 />
 
                 <InputField
-                    label="Exposure frequency (EF)"
+                    label="Exposure frequency (EF) days/year"
                     type="number"
                     value={EF}
                     onChange={(e) => {
@@ -107,7 +131,7 @@ export default function HealthRiskCalculatorPage(): JSX.Element {
                 />
 
                 <InputField
-                    label="Exposure duration (ED)"
+                    label="Exposure duration (ED) years"
                     type="number"
                     value={ED}
                     onChange={(e) => {
@@ -116,7 +140,7 @@ export default function HealthRiskCalculatorPage(): JSX.Element {
                 />
 
                 <InputField
-                    label="Body weight (BW)"
+                    label="Body weight (BW) kg"
                     type="number"
                     value={BW}
                     onChange={(e) => {
@@ -125,7 +149,7 @@ export default function HealthRiskCalculatorPage(): JSX.Element {
                 />
 
                 <InputField
-                    label="Averaging time (AT)"
+                    label="Averaging time (AT) days"
                     type="number"
                     value={AT}
                     onChange={(e) => {
@@ -134,20 +158,22 @@ export default function HealthRiskCalculatorPage(): JSX.Element {
                 />
 
                 <InputField
-                    label="RfC"
+                    label="Reference concentration (RfC) mg/m^3"
                     type="number"
                     step={0.000001}
                     value={RFC}
+                    disabled={measuredParameter !== undefined}
                     onChange={(e) => {
                         setRfC(Number(e.target.value));
                     }}
                 />
 
                 <InputField
-                    label="Slope factor (SF)"
+                    label="Slope factor (SF) mg/(kg*day)"
                     type="number"
                     step={0.0001}
                     value={SF}
+                    disabled={measuredParameter !== undefined}
                     onChange={(e) => {
                         setSF(Number(e.target.value));
                     }}
@@ -160,7 +186,9 @@ export default function HealthRiskCalculatorPage(): JSX.Element {
 
             {(
                 <div className={styles.resultBox}>
-                    <HealthRiskLevels risk={result}/>
+                    <HealthRiskLevel label={"Chronic Daily Intake (CDI)"} value={result?.CDI} getLevel={getCDIlevel}/>
+                    <HealthRiskLevel label={"Carcinogenic Risk (CR)"} value={result?.CR} getLevel={getCRlevel}/>
+                    <HealthRiskLevel label={"Hazard Quotient (HQ)"} value={result?.HQ} getLevel={getHQlevel}/>
                 </div>
             )}
 
