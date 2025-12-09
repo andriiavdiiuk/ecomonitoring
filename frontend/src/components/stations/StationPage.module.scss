@@ -3,6 +3,23 @@
 .table {
   margin: 50px;
 
+  .expanded {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    gap: 0.6rem;
+
+    .item {
+      display: flex;
+      align-items: stretch;
+      justify-content: space-between;
+      gap: 1rem;
+      min-height: 40px;
+
+      .pollutant { min-width: 120px; flex-shrink:0; } .health_risk { display: flex; flex-direction: row; gap: 0.8rem; align-items: center; white-space: nowrap; }
+    }
+  }
+
 }
 .controls {
 

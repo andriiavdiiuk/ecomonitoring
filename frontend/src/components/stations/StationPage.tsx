@@ -14,7 +14,8 @@ import type Station from "common/entities/Station.ts";
 import type {Measurement} from "common/entities/Measurement.ts";
 import {MeasuredParameters} from "common/entities/Pollutant.ts";
 import type {PaginationResult} from "common/Results.ts";
-import HealthRiskLevels from "frontend/components/health_risk/HealthRiskLevels.tsx";
+import HealthRiskLevel from "frontend/components/health_risk/HealthRiskLevel.tsx";
+import {getCDIlevel, getCRlevel, getHQlevel} from "frontend/components/health_risk/HealthRiskLevels.ts";
 
 interface Search {
     pollutant: string,
@@ -56,30 +57,27 @@ export default function StationPage(): JSX.Element {
             measurementService.getMeasurements({station_id: id, page: currentPage, limit: 20, ...params})
                 .then((res) => {
                     setMeasurements(res);
-                    const mapped: TableRowData[] = [];
-                    res.data.forEach((m: Measurement) => {
-                        m.pollutants.forEach((p) => {
-                            let edit: string | JSX.Element = '';
 
-                            if (userContext.user?.isRole('admin')) {
-                                const path = generatePath(AppRoutes.EditMeasurement, {
-                                    station_id: id,
-                                    measurement_id: m._id,
-                                })
+                    const mapped: TableRowData[] = res.data.map(m => {
+                        let edit: string | JSX.Element = '';
 
-                                edit = <Link to={path}>Edit</Link>;
-                            }
-                            const rowId = `${m._id},${p.pollutant}`;
-                            mapped.push({
-                                row: [
-                                    new Date(m.measurement_time).toLocaleString(),
-                                    p.pollutant,
-                                    `${String(p.value)} ${p.unit}`,
-                                    ...(edit ? [edit] : []),
-                                ],
-                                rowId: rowId
-                            });
-                        });
+                        if (userContext.user?.isRole('admin')) {
+                            const path = generatePath(AppRoutes.EditMeasurement, {
+                                station_id: id,
+                                measurement_id: m._id,
+                            })
+
+                            edit = <Link to={path}>Edit</Link>;
+                        }
+
+                        return {
+                            row: [
+                                new Date(m.measurement_time).toLocaleString(),
+                                m.pollutants.map(p => p.pollutant).join(", "),
+                                ...(edit ? [edit] : []),
+                            ],
+                            rowId: m._id
+                        };
                     });
 
                     setTableData(mapped);
@@ -89,28 +87,43 @@ export default function StationPage(): JSX.Element {
                     setTableData([]);
                 });
         }, 500);
+
         return () => {
-            clearTimeout(handler)
+            clearTimeout(handler);
         };
     }, [id, currentPage, search, userContext.user]);
+
 
     useEffect(() => {
         if (!expandedPollutants || !measurements) return;
 
         setTableData(prev =>
             prev.map(rowData => {
-                const rowId = rowData.rowId;
-                if (rowId && expandedPollutants.has(rowId)) {
-                    const [measurementId, pollutantName] = rowId.split(',');
-                    const measurement = measurements.data.find(m => m._id === measurementId);
+                const id = rowData.rowId;
+                if (id && expandedPollutants.has(id)) {
+                    const measurement = measurements.data.find(m => m._id === id);
                     if (!measurement) return {...rowData, afterRow: undefined};
-                    const pollutant = measurement.pollutants.find(p => p.pollutant.toString() === pollutantName && p.health_risk);
-                    if (!pollutant) return {...rowData, afterRow: undefined};
 
                     return {
                         ...rowData,
                         afterRow: (
-                            <HealthRiskLevels risk={pollutant.health_risk}/>
+                            <div className={styles.expanded}>
+                                {measurement.pollutants.map(p => (
+                                    <div key={p.pollutant} className={styles.item}>
+                                        <span className={styles.pollutant}>
+                                            <strong>{p.pollutant}</strong>: {String(p.value)} {p.unit}
+                                        </span>
+                                        {p.health_risk && (
+                                            <div className={styles.health_risk}>
+                                                <HealthRiskLevel label={"CDI"} value={p.health_risk.CDI} getLevel={getCDIlevel}/>
+                                                <HealthRiskLevel label={"CR"} value={p.health_risk.CR} getLevel={getCRlevel}/>
+                                                <HealthRiskLevel label={"HQ"} value={p.health_risk.HQ} getLevel={getHQlevel}/>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+
                         )
                     };
                 }
@@ -118,7 +131,6 @@ export default function StationPage(): JSX.Element {
             })
         );
     }, [expandedPollutants, measurements]);
-
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -142,7 +154,7 @@ export default function StationPage(): JSX.Element {
             })
     }
 
-    const header = ["Time", "Pollutants", "Value"];
+    const header = ["Time", "Pollutants"];
 
     if (userContext.user?.isRole('admin')) {
         header.push('Controls');
@@ -254,6 +266,5 @@ export default function StationPage(): JSX.Element {
                 />
             </section>
         </div>
-    )
-        ;
+    );
 }
